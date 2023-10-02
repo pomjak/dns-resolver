@@ -2,7 +2,7 @@ CXX=g++
 RM=rm -f
 CPPFLAGS= -O2 -std=c++20 -Wall -Wextra -Wpedantic 
 DEBUG= -g
-SRCS=src/dns.cc
+SRCS=src/dns.cc src/param_parser.cc
 OBJS=dns
 
 make:$(SRCS)
