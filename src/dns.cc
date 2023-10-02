@@ -6,11 +6,27 @@
 int get_args(int argc, char **argv)
 {
     int opt;
-    while (opt = getopt(argc, argv, "rx6spa;"))
+    while (opt = getopt(argc, argv, "rx6s:p") != -1)
     {
         switch(opt)
         {
-            
+          case 'r':
+          break;
+
+          case 'x':
+          break;
+
+          case '6':
+          break;
+
+          case 's':
+          break;
+
+          case 'p':
+          break;
+          
+          deafult:
+          break;
         }
     }
 }
