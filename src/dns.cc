@@ -11,45 +11,48 @@ void get_args(int argc, char **argv)
     std::string address;
     while ((opt = getopt(argc, argv, "rx6s:p:")) != -1)
     {
-        switch(opt)
+        switch (opt)
         {
-          case 'r':
+        case 'r':
             std::cout << "reverse" << std::endl;
-          break;
+            break;
 
-          case 'x':
+        case 'x':
             std::cout << "turncated" << std::endl;
-          break;
+            break;
 
-          case '6':
+        case '6':
             std::cout << "ip6" << std::endl;
-          break;
+            break;
 
-          case 's':
+        case 's':
             server = optarg;
             std::cout << "server: " << server << std::endl;
-          break;
+            break;
 
-          case 'p':
+        case 'p':
             port = optarg;
-            std::cout << "port" << port <<std::endl;
-          break;
+            std::cout << "port" << port << std::endl;
+            break;
 
-          default:
+        default:
             std::cout << "usage" << std::endl;
-          break;
+            break;
         }
     }
-    if (optind < argc) {
+    if (optind < argc)
+    {
         address = argv[optind];
         std::cout << address << std::endl;
-    } else {
+    }
+    else
+    {
         std::cerr << "Address is a required parameter." << std::endl;
     }
 }
 
 int main(int argc, char **argv)
 {
-    get_args(argc,argv);
+    get_args(argc, argv);
     return 0;
 }
