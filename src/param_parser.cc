@@ -4,7 +4,7 @@ void param_parser::process_params(int argc, char **argv)
 {
     int opt;
     
-    if(argc < 2)
+    if(argc < 2 )
         std::cerr << "USAGE: dns [-r] [-x] [-6] -s server [-p port] address" << std::endl;
 
     while ((opt = getopt(argc, argv, "rx6s:p:")) != -1)
@@ -33,7 +33,7 @@ void param_parser::process_params(int argc, char **argv)
             break;
 
         default:
-            std::cerr << "usage" << std::endl;
+            std::cerr << "USAGE: dns [-r] [-x] [-6] -s server [-p port] address" << std::endl;
             break;
         }
     }

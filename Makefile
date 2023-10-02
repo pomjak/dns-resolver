@@ -1,15 +1,21 @@
 CXX=g++
 RM=rm -f
-CPPFLAGS= -O2 -std=c++20 -Wall -Wextra -Wpedantic 
+# cc flags
+CXXFLAGS := -std=c++20
+# C PreProcessor flags
+# -Iinclude to include .h files
+CPPFLAGS = -Iinclude
+CFLAGS= -O2  -Wall -Wextra -Wpedantic 
 DEBUG= -g
-SRCS=src/dns.cc src/param_parser.cc
+SRC_DIR := src
+SRC := $(wildcard $(SRC_DIR)/*.cc)
 OBJS=dns
 
-make:$(SRCS)
-	$(CXX) $(CPPFLAGS) -o $(OBJS) $(SRCS)
+make:$(SRC)
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(CFLAGS) -o $(OBJS) $(SRC)
 
-debug:$(SRCS)
-	$(CXX) $(CPPFLAGS) $(DEBUG) -o $(OBJS) $(SRCS)
+debug:$(SRC)
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(CFLAGS) $(DEBUG)-o $(OBJS) $(SRC)
 
 clean:
 	$(RM) $(OBJS)

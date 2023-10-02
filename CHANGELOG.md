@@ -1,0 +1,9 @@
+- added param proccessing
+- fix indent space
+- get opt ok
+- structure of getopt in progress
+- added getopt
+- init make
+- changed structure of files
+- added basic file structure
+- added .gitignore
