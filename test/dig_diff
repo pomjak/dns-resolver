@@ -1,0 +1,27 @@
+#!/bin/sh
+while read -r domain;
+    do
+        echo "-------------------------------------"
+
+        dig_output="$(dig "$domain" +noall +answer)"
+        prog_output="$(../dns "$domain")"
+        # echo "$prog_output"
+        no_of_ans=$(echo "$dig_output" | wc -l) 
+
+        for i in $(seq $no_of_ans)
+        do
+            line=$(echo "$dig_output" | sed "${i}q;d")
+            name=$(echo "$line" | awk '{print $1}')
+            ttl=$(echo "$line" | awk '{print $2}')
+            class=$(echo "$line" | awk '{print $3}')
+            type=$(echo "$line" | awk '{print $4}')
+            data=$(echo "$line" | awk '{print $5}')
+
+            echo "$i name:  $name"
+            echo "$i ttl:   $ttl"
+            echo "$i class: $class"
+            echo "$i type:  $type"        
+            echo -e "$i data:  $data \n"
+        done
+    done
+
