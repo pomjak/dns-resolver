@@ -3,8 +3,8 @@
 void param_parser::process_params(int argc, char **argv)
 {
     int opt;
-    
-    if(argc < 2 )
+
+    if (argc < 2)
         std::cerr << "USAGE: dns [-r] [-x] [-6] -s server [-p port] address" << std::endl;
 
     while ((opt = getopt(argc, argv, "rx6s:p:")) != -1)
@@ -28,7 +28,6 @@ void param_parser::process_params(int argc, char **argv)
             break;
 
         case 'p':
-
             this->set_port(std::stoi(optarg));
             break;
 
@@ -40,6 +39,6 @@ void param_parser::process_params(int argc, char **argv)
 
     if (optind < argc)
         this->set_address(argv[optind]);
-    else 
-        std::cerr << "Address is a required parameter." << std::endl;
+    else
+        throw std::invalid_argument("Address must be set");
 }

@@ -4,7 +4,7 @@ while read -r domain;
         echo "-------------------------------------"
 
         dig_output="$(dig "$domain" +noall +answer)"
-        prog_output="$(../dns "$domain")"
+        # prog_output="$(../dns "$domain")"
         # echo "$prog_output"
         no_of_ans=$(echo "$dig_output" | wc -l) 
 

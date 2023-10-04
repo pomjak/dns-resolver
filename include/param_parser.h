@@ -16,7 +16,7 @@ private:
     std::string server;
     int port;
     std::string address;
-
+    
     void set_recursion(bool r) { this->recursion = r; }
 
     void set_reverse(bool x) { this->reverse = x; }

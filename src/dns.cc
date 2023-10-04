@@ -1,7 +1,7 @@
 #include <iostream>
-#include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <exception>
 #include "param_parser.h"
 
 #define UDP_LIMIT 255
@@ -10,7 +10,23 @@ int main(int argc, char **argv)
 {
     param_parser param;
 
-    param.process_params(argc, argv);
+    try
+    {
+        param.process_params(argc, argv);
+    }
+
+    catch (const std::invalid_argument &e)
+    {
+        std::cerr << "Invalid Argument Exception: " << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    catch (const std::exception &e)
+    {
+        std::cerr << "Generic Exception: " << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
+
     int resolver_socket;
 
     if ((resolver_socket = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
