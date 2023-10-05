@@ -3,6 +3,8 @@
 
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include"param_parser.h"
+
 
 class communicate {
     private:
@@ -14,7 +16,7 @@ class communicate {
         {
             this->resolver_socket=-1;
         }
-        void start(int port);
+        void start(param_parser *param);
         void send(void);
         void recv(void);
         void end(void);
