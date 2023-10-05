@@ -3,6 +3,7 @@
 #include <random>
 #include <vector>
 #include <arpa/inet.h>
+#include <sstream>
 #include "param_parser.h"
 
 // HEADER
@@ -37,6 +38,7 @@ struct Question
 {
     uint16_t qtype;
     uint16_t qclass;
+    std::vector<uint8_t> qname;
 };
 
 class DnsMessage
@@ -49,13 +51,16 @@ private:
     void set_header_id(void);
     void set_recursion(bool _);
     void set_opcode(bool _);
-    void set_address(std::string _);
+    void set_class_type(bool ipv6);
+    void convert_address(std::string _);
 
 public:
     DnsMessage()
     {
         memset(&header, 0, sizeof(struct Header));
-        memset(&question, 0, sizeof(struct Question));
+        question.qclass = 0;
+        question.qtype = 0;
+        question.qname.clear();
     }
     void construct_msg(param_parser *param);
 
