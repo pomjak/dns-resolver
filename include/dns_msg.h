@@ -1,5 +1,4 @@
-#ifndef DNS_MSG
-#define DNS_MSG
+#pragma once
 
 #include <random>
 #include <vector>
@@ -51,5 +50,3 @@ public:
 
     std::vector<uint8_t> handover(void);
 };
-
-#endif

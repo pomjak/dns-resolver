@@ -1,5 +1,4 @@
-#ifndef PARAM_PARSER
-#define PARAM_PARSER
+#pragma once
 
 #include <iostream>
 #include <cstring>
@@ -53,5 +52,3 @@ public:
 
     std::string get_address(void) { return this->address; }
 };
-
-#endif

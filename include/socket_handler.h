@@ -1,11 +1,11 @@
-#ifndef SOCKET_HANDLER
-#define SOCKET_HANDLER
+#pragma once 
 
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <cstring>
 #include <cerrno>
 #include <vector>
+
 #include"param_parser.h"
 
 
@@ -26,5 +26,3 @@ class communicate {
 
 
 };
-
-#endif

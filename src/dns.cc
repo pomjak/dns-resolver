@@ -15,11 +15,12 @@ int main(int argc, char **argv)
         param.process_params(argc, argv);
 
         sckt.start(&param); 
+
         msg.construct_msg(&param);
+
         sckt.send(msg.handover());
 
         sckt.end();
-
     }
 
     catch (const std::invalid_argument &e)

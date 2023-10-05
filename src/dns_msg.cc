@@ -34,7 +34,6 @@ void DnsMessage::construct_msg(param_parser *param)
     if (param->get_reverse())
         this->set_opcode(true);
 
-    // if(param->get_port() != 53);
 
     // param->get_server();
     // param->get_address();
