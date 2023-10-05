@@ -35,7 +35,7 @@ public:
         this->reverse = false;
         this->ipv6 = false;
         this->server = "";
-        this->port = -1;
+        this->port = 53;
         this->address = "";
     }
 
