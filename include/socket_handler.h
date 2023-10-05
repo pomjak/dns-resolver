@@ -3,6 +3,9 @@
 
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <cstring>
+#include <cerrno>
+#include <vector>
 #include"param_parser.h"
 
 
@@ -17,7 +20,7 @@ class communicate {
             this->resolver_socket=-1;
         }
         void start(param_parser *param);
-        void send(void);
+        void send(std::vector<uint8_t> msg);
         void recv(void);
         void end(void);
 

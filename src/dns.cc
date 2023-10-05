@@ -2,17 +2,24 @@
 #include <exception>
 #include "param_parser.h"
 #include "socket_handler.h"
+#include "dns_msg.h"
 
 int main(int argc, char **argv)
 {
     param_parser param;
     communicate sckt;
+    DnsMessage msg;
 
     try
     {
         param.process_params(argc, argv);
+
         sckt.start(&param); 
-        sckt.send();
+        msg.construct_msg(&param);
+        sckt.send(msg.handover());
+
+        sckt.end();
+
     }
 
     catch (const std::invalid_argument &e)
