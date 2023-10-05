@@ -24,6 +24,11 @@ void DnsMessage::set_opcode(bool inverse)
         header.opcode = htons(1);
 }
 
+void DnsMessage::set_address(std::string addr)
+{
+    
+}
+
 void DnsMessage::construct_msg(param_parser *param)
 {
     this->set_header_id();
@@ -34,9 +39,8 @@ void DnsMessage::construct_msg(param_parser *param)
     if (param->get_reverse())
         this->set_opcode(true);
 
-
     // param->get_server();
-    // param->get_address();
+    param->get_address();
     
     header.q_count = htons(1);
 
