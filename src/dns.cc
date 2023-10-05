@@ -1,14 +1,18 @@
 #include <iostream>
 #include <exception>
 #include "param_parser.h"
+#include "socket_handler.h"
 
 int main(int argc, char **argv)
 {
     param_parser param;
+    communicate sckt;
 
     try
     {
         param.process_params(argc, argv);
+        sckt.start(&param); 
+        sckt.send();
     }
 
     catch (const std::invalid_argument &e)
