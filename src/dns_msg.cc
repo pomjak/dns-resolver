@@ -32,10 +32,10 @@ void DnsMessage::set_opcode(bool inverse)
 
 void DnsMessage::set_class_type(bool ipv6, bool inverse)
 {
-    if (ipv6)
-        question.qtype = htons(28); // AAAA
-    else if (inverse)
+    if (inverse)
         question.qtype = htons(12); // PTR
+    else if (ipv6)
+        question.qtype = htons(28); // AAAA
     else
         question.qtype = htons(1); // A
 
@@ -66,21 +66,18 @@ void DnsMessage::reverse_address(std::string addr)
     std::stringstream sa(addr);
     std::stringstream ss(sufix);
 
-    std::stack<uint8_t> stack; 
+    std::stack<uint8_t> stack;
+    std::string octet[4];
     std::string temp;
 
-    while (std::getline(sa, temp, '.'))
-    {
-        stack.push(static_cast<uint8_t>(temp.length()));
+    for (int i = 0; std::getline(sa, octet[i], '.'); i++);
 
-        for (char c : temp)
-            stack.push(static_cast<uint8_t>(c));
-    }
-
-    while(!stack.empty())
+    for (int i = 3; i >= 0; i--)
     {
-        qname.push_back(static_cast<uint8_t>(stack.top()));
-        stack.pop();
+        qname.push_back(static_cast<uint8_t>(octet[i].length()));
+
+        for (char c : octet[i])
+            qname.push_back(static_cast<uint8_t>(c));
     }
 
     while (std::getline(ss, temp, '.'))
