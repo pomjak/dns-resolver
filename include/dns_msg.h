@@ -4,6 +4,7 @@
 #include <vector>
 #include <arpa/inet.h>
 #include <sstream>
+#include <stack>
 #include "param_parser.h"
 
 // HEADER
@@ -52,7 +53,8 @@ private:
     void set_recursion(bool _);
     void set_opcode(bool _);
     void set_class_type(bool ipv6, bool inverse);
-    void convert_address(std::string _,bool inverse);
+    void direct_address(std::string _);
+    void reverse_address(std::string _);
 
 public:
     DnsMessage()
