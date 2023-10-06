@@ -21,16 +21,21 @@ void DnsMessage::set_recursion(bool recursion)
 
 void DnsMessage::set_opcode(bool inverse)
 {
+    std::cout << "opcode settin" << std::endl;
     if (inverse)
-        header.opcode = htons(1);
+    {
+        std::cout << "inverse" << std::endl;
+
+        header.opcode = 0x1;
+    }
 }
 
 void DnsMessage::set_class_type(bool ipv6)
 {
-    if (!ipv6)
-        question.qtype = htons(1);
+    if (ipv6)
+        question.qtype = htons(28);//AAAA
     else
-        question.qtype = htons(28);
+        question.qtype = htons(1);//A
 
     question.qclass = htons(1); // INternet class
 }
@@ -43,13 +48,13 @@ void DnsMessage::convert_address(std::string addr)
 
     while (std::getline(ss, label, '.'))
     {
-        question.qname.push_back(static_cast<uint8_t>(label.length()));
+        qname.push_back(static_cast<uint8_t>(label.length()));
 
         for (char c : label)
-            question.qname.push_back(static_cast<uint8_t>(c));
+            qname.push_back(static_cast<uint8_t>(c));
     }
 
-    question.qname.push_back(0);
+    qname.push_back(0);
 }
 
 void DnsMessage::construct_msg(param_parser *param)
@@ -73,11 +78,13 @@ std::vector<uint8_t> DnsMessage::handover(void)
 {
     std::vector<uint8_t> buf;
     buf.resize(sizeof(Header));
-    memcpy(buf.data(), &header, sizeof(header));
+    memcpy(buf.data(), &header, sizeof(Header));
+
+    buf.insert(buf.end(), qname.begin(), qname.end());
 
     std::vector<uint8_t> buf_q;
     buf_q.resize(sizeof(Question));
-    memcpy(buf_q.data(), &question, sizeof(question));
+    memcpy(buf_q.data(), &question, sizeof(Question));
 
     buf.insert(buf.end(), buf_q.begin(), buf_q.end());
 

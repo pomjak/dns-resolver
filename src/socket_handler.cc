@@ -17,7 +17,8 @@ void communicate::start(param_parser *param)
 }
 void communicate::send(std::vector<uint8_t> msg)
 {
-    int bytes_tx = sendto(this->resolver_socket, msg.data(), sizeof(msg.data()), MSG_CONFIRM, (struct sockaddr *)&server_addr, sizeof(server_addr));
+    std::cout << std::hex << msg.data() << std::endl;
+    int bytes_tx = sendto(this->resolver_socket, msg.data(), msg.size(), MSG_CONFIRM, (struct sockaddr *)&server_addr, sizeof(server_addr));
     if (bytes_tx < 0)
         throw std::runtime_error("sending msg failed" + std::string(strerror(errno)));
 }
@@ -30,6 +31,7 @@ void communicate::recv(void)
     if (bytes_rx < 0)
         throw std::runtime_error("recv of response failed" + std::string(strerror(errno)));
 }
+
 void communicate::end(void)
 {
     close(resolver_socket);

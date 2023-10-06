@@ -38,7 +38,6 @@ struct Question
 {
     uint16_t qtype;
     uint16_t qclass;
-    std::vector<uint8_t> qname;
 };
 
 class DnsMessage
@@ -47,6 +46,7 @@ class DnsMessage
 private:
     Header header;
     Question question;
+    std::vector<uint8_t> qname;
 
     void set_header_id(void);
     void set_recursion(bool _);
@@ -60,7 +60,7 @@ public:
         memset(&header, 0, sizeof(struct Header));
         question.qclass = 0;
         question.qtype = 0;
-        question.qname.clear();
+        qname.clear();
     }
     void construct_msg(param_parser *param);
 
