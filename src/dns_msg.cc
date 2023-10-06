@@ -30,20 +30,23 @@ void DnsMessage::set_opcode(bool inverse)
     }
 }
 
-void DnsMessage::set_class_type(bool ipv6)
+void DnsMessage::set_class_type(bool ipv6, bool inverse)
 {
     if (ipv6)
-        question.qtype = htons(28);//AAAA
+        question.qtype = htons(28); // AAAA
+    else if (inverse)
+        question.qtype = htons(12); // PTR
     else
-        question.qtype = htons(1);//A
+        question.qtype = htons(1); // A
 
     question.qclass = htons(1); // INternet class
 }
 
-void DnsMessage::convert_address(std::string addr)
+void DnsMessage::convert_address(std::string addr, bool inverse)
 {
-
     std::stringstream ss(addr);
+
+    
     std::string label;
 
     while (std::getline(ss, label, '.'))
@@ -54,6 +57,13 @@ void DnsMessage::convert_address(std::string addr)
             qname.push_back(static_cast<uint8_t>(c));
     }
 
+    std::string sufix = "in-addr.arpa";
+    if(inverse)
+    {
+        for(char i : sufix)
+            qname.push_back(static_cast<uint8_t>(i));
+    }
+    
     qname.push_back(0);
 }
 
@@ -64,12 +74,12 @@ void DnsMessage::construct_msg(param_parser *param)
     if (param->get_recursion())
         this->set_recursion(true);
 
-    if (param->get_reverse())
-        this->set_opcode(true);
+    // if (param->get_reverse())
+    //     this->set_opcode(true);
 
-    this->set_class_type(param->get_ipv6());
+    this->set_class_type(param->get_ipv6(), param->get_reverse());
 
-    this->convert_address(param->get_address());
+    this->convert_address(param->get_address(), param->get_reverse());
 
     header.q_count = htons(1);
 }

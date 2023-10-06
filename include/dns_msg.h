@@ -51,8 +51,8 @@ private:
     void set_header_id(void);
     void set_recursion(bool _);
     void set_opcode(bool _);
-    void set_class_type(bool ipv6);
-    void convert_address(std::string _);
+    void set_class_type(bool ipv6, bool inverse);
+    void convert_address(std::string _,bool inverse);
 
 public:
     DnsMessage()
