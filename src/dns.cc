@@ -16,7 +16,7 @@ int main(int argc, char **argv)
 
         sckt.start(&param); 
 
-        msg.construct_msg(&param);
+        msg.constructMsg(&param);
 
         sckt.send(msg.handover());
 

@@ -1,6 +1,6 @@
 #include "dns_msg.h"
 
-void DnsMessage::set_header_id(void)
+void DnsMessage::setHeaderId(void)
 {
     std::random_device rd;
 
@@ -9,28 +9,15 @@ void DnsMessage::set_header_id(void)
     std::uniform_int_distribution<uint16_t> distribution(0, std::numeric_limits<uint16_t>::max());
 
     header.id = (unsigned short)htons(distribution(gen));
-
-    std::cout << std::hex << header.id << std::endl;
 }
 
-void DnsMessage::set_recursion(bool recursion)
+void DnsMessage::setRecursion(bool recursion)
 {
     if (recursion)
         header.rd = 1;
 }
 
-void DnsMessage::set_opcode(bool inverse)
-{
-    std::cout << "opcode settin" << std::endl;
-    if (inverse)
-    {
-        std::cout << "inverse" << std::endl;
-
-        header.opcode = 0x1;
-    }
-}
-
-void DnsMessage::set_class_type(bool ipv6, bool inverse)
+void DnsMessage::setClassAndType(bool ipv6, bool inverse)
 {
     if (inverse)
         question.qtype = htons(12); // PTR
@@ -42,7 +29,7 @@ void DnsMessage::set_class_type(bool ipv6, bool inverse)
     question.qclass = htons(1); // INternet class
 }
 
-void DnsMessage::direct_address(std::string addr)
+void DnsMessage::directAddress(std::string addr)
 {
     std::stringstream ss(addr);
 
@@ -59,18 +46,15 @@ void DnsMessage::direct_address(std::string addr)
     qname.push_back(0);
 }
 
-void DnsMessage::reverse_address(std::string addr)
+void DnsMessage::reverseAddress(std::string addr)
 {
-    std::string sufix = "in-addr.arpa";
+    std::stringstream ssa(addr);
 
-    std::stringstream sa(addr);
-    std::stringstream ss(sufix);
-
-    std::stack<uint8_t> stack;
     std::string octet[4];
     std::string temp;
 
-    for (int i = 0; std::getline(sa, octet[i], '.'); i++);
+    for (int i = 0; std::getline(ssa, octet[i], '.'); i++)
+        ;
 
     for (int i = 3; i >= 0; i--)
     {
@@ -80,7 +64,10 @@ void DnsMessage::reverse_address(std::string addr)
             qname.push_back(static_cast<uint8_t>(c));
     }
 
-    while (std::getline(ss, temp, '.'))
+    std::string sufix = "in-addr.arpa";
+    std::stringstream sss(sufix);
+
+    while (std::getline(sss, temp, '.'))
     {
         qname.push_back(static_cast<uint8_t>(temp.length()));
 
@@ -91,19 +78,19 @@ void DnsMessage::reverse_address(std::string addr)
     qname.push_back(0);
 }
 
-void DnsMessage::construct_msg(param_parser *param)
+void DnsMessage::constructMsg(param_parser *param)
 {
-    this->set_header_id();
+    this->setHeaderId();
 
     if (param->get_recursion())
-        this->set_recursion(true);
+        this->setRecursion(true);
 
-    this->set_class_type(param->get_ipv6(), param->get_reverse());
+    this->setClassAndType(param->get_ipv6(), param->get_reverse());
 
     if (!(param->get_reverse()))
-        this->direct_address(param->get_address());
+        this->directAddress(param->get_address());
     else
-        this->reverse_address(param->get_address());
+        this->reverseAddress(param->get_address());
 
     header.q_count = htons(1);
 }

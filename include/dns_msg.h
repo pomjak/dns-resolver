@@ -4,7 +4,6 @@
 #include <vector>
 #include <arpa/inet.h>
 #include <sstream>
-#include <stack>
 #include "param_parser.h"
 
 // HEADER
@@ -49,12 +48,11 @@ private:
     Question question;
     std::vector<uint8_t> qname;
 
-    void set_header_id(void);
-    void set_recursion(bool _);
-    void set_opcode(bool _);
-    void set_class_type(bool ipv6, bool inverse);
-    void direct_address(std::string _);
-    void reverse_address(std::string _);
+    void setHeaderId(void);
+    void setRecursion(bool _);
+    void setClassAndType(bool ipv6, bool inverse);
+    void directAddress(std::string _);
+    void reverseAddress(std::string _);
 
 public:
     DnsMessage()
@@ -64,7 +62,7 @@ public:
         question.qtype = 0;
         qname.clear();
     }
-    void construct_msg(param_parser *param);
+    void constructMsg(param_parser *param);
 
     std::vector<uint8_t> handover(void);
 };

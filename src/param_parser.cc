@@ -42,6 +42,6 @@ void param_parser::process_params(int argc, char **argv)
     else
         throw std::invalid_argument("Address must be set");
 
-    if(get_server() == "")
+    if (get_server() == "")
         throw std::invalid_argument("Server address must be set");
 }
