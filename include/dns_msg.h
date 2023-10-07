@@ -40,6 +40,16 @@ struct Question
     uint16_t qclass;
 };
 
+struct ResourceRecord
+{
+    uint16_t type;
+    uint16_t Rclass;
+    uint16_t ttl;
+    uint16_t length;
+};
+
+
+
 class DnsMessage
 {
 
@@ -47,6 +57,16 @@ private:
     Header header;
     Question question;
     std::vector<uint8_t> qname;
+
+    ResourceRecord answer;
+    std::vector<uint8_t> AnswerData;
+
+    ResourceRecord authority;    
+    std::vector<uint8_t> AuthorityData;
+
+    ResourceRecord additional;    
+    std::vector<uint8_t> AdditionalData;
+
 
     void setHeaderId(void);
     void setRecursion(bool _);
@@ -58,10 +78,17 @@ public:
     DnsMessage()
     {
         memset(&header, 0, sizeof(struct Header));
-        question.qclass = 0;
-        question.qtype = 0;
+        memset(&question, 0, sizeof(struct Question));
+        memset(&answer, 0, sizeof(struct ResourceRecord));
+        memset(&authority, 0, sizeof(struct ResourceRecord));
+        memset(&additional, 0, sizeof(struct ResourceRecord));
+
         qname.clear();
+        AnswerData.clear();
+        AuthorityData.clear();
+        AdditionalData.clear();
     }
+    
     void constructMsg(param_parser *param);
 
     std::vector<uint8_t> handover(void);
