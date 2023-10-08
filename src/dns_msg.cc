@@ -95,6 +95,11 @@ void DnsMessage::constructMsg(param_parser *param)
     header.q_count = htons(1);
 }
 
+void DnsMessage::deconstructMsg(void)
+{
+
+}
+
 std::vector<uint8_t> DnsMessage::handover(void)
 {
     std::vector<uint8_t> buf;
@@ -110,4 +115,17 @@ std::vector<uint8_t> DnsMessage::handover(void)
     buf.insert(buf.end(), buf_q.begin(), buf_q.end());
 
     return buf;
+}
+
+void DnsMessage::recvMsg(std::vector<uint8_t> response)
+{
+    memcpy(&header, response.data(), sizeof(Header));
+
+    memcpy(&question, response.data()+sizeof(Header)+qname.size(), sizeof(Question));
+
+    
+
+    memcpy(&answer, response.data()+sizeof(Header)+qname.size()+sizeof(Question), sizeof(ResourceRecord));
+
+
 }

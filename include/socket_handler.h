@@ -21,7 +21,7 @@ class communicate {
         }
         void start(param_parser *param);
         void send(std::vector<uint8_t> msg);
-        void recv(void);
+        std::vector<uint8_t> recv(void);
         void end(void);
 
 

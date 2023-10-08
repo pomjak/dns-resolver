@@ -88,8 +88,12 @@ public:
         AuthorityData.clear();
         AdditionalData.clear();
     }
-    
+
     void constructMsg(param_parser *param);
 
+    void deconstructMsg(void);
+
     std::vector<uint8_t> handover(void);
+
+    void recvMsg(std::vector<uint8_t> response);
 };
