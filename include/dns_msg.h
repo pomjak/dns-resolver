@@ -44,7 +44,7 @@ struct ResourceRecord
 {
     uint16_t type;
     uint16_t Rclass;
-    uint16_t ttl;
+    uint32_t ttl;
     uint16_t length;
 };
 
@@ -55,8 +55,8 @@ class DnsMessage
 
 private:
     Header header;
-    Question question;
     std::vector<uint8_t> qname;
+    Question question;
 
     ResourceRecord answer;
     std::vector<uint8_t> AnswerData;

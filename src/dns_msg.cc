@@ -118,14 +118,19 @@ std::vector<uint8_t> DnsMessage::handover(void)
 }
 
 void DnsMessage::recvMsg(std::vector<uint8_t> response)
-{
+{   
+    //Header
+
+    //qname
+    //question
+    
+    //ans_name
     memcpy(&header, response.data(), sizeof(Header));
 
     memcpy(&question, response.data()+sizeof(Header)+qname.size(), sizeof(Question));
 
     
 
-    memcpy(&answer, response.data()+sizeof(Header)+qname.size()+sizeof(Question), sizeof(ResourceRecord));
 
 
 }

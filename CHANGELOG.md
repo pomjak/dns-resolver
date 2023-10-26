@@ -1,3 +1,24 @@
+- prepare for response recv
+- add struct ans,auth,addit
+- slight refactor
+- reverse query done
+- reverse query wip again
+- inv q fix WIP
+- sending query ok
+- add address to question part, however not working
+- add question structure
+- refactor pragama once
+- add conctructing msg-header
+- fix server flag is required
+- fix err exceptions
+- edit default port to 53
+- implementing start,send,recv,end in socket_handler
+- edit flags to struct
+- add socket_handler module
+- add exception handling
+- added socket handling
+- added test
+- restructuralization of files
 - added param proccessing
 - fix indent space
 - get opt ok
