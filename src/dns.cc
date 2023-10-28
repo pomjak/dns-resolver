@@ -22,8 +22,6 @@ int main(int argc, char **argv)
 
         msg.recvMsg(sckt.recv());
 
-        msg.deconstructMsg();
-        
         sckt.end();
     }
 

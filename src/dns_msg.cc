@@ -64,8 +64,8 @@ void DnsMessage::reverseAddress(std::string addr)
             qname.push_back(static_cast<uint8_t>(c));
     }
 
-    std::string sufix = "in-addr.arpa";
-    std::stringstream sss(sufix);
+    std::string suffix = "in-addr.arpa";
+    std::stringstream sss(suffix);
 
     while (std::getline(sss, temp, '.'))
     {
@@ -95,11 +95,6 @@ void DnsMessage::constructMsg(param_parser *param)
     header.q_count = htons(1);
 }
 
-void DnsMessage::deconstructMsg(void)
-{
-
-}
-
 std::vector<uint8_t> DnsMessage::handover(void)
 {
     std::vector<uint8_t> buf;
@@ -118,19 +113,26 @@ std::vector<uint8_t> DnsMessage::handover(void)
 }
 
 void DnsMessage::recvMsg(std::vector<uint8_t> response)
-{   
-    //Header
+{
+    // size_t offset = 0;
+    // memcpy(&header, response.data(), sizeof(Header));
 
-    //qname
-    //question
-    
-    //ans_name
+    // memcpy(&question, response.data() + offset, sizeof(Question));
+
+    // offset += sizeof(Question);
+    // memcpy(&answer, response.data() + offset, sizeof(ResourceRecord));
+
+    // offset += sizeof(ResourceRecord);
+    // memcpy(&authority, response.data() + offset, sizeof(ResourceRecord));
+
+    // offset += sizeof(ResourceRecord);
+    // memcpy(&additional, response.data() + offset, sizeof(ResourceRecord));
+    size_t offset = 0;
+
+    memset(&header, 0, sizeof(Header));
     memcpy(&header, response.data(), sizeof(Header));
 
-    memcpy(&question, response.data()+sizeof(Header)+qname.size(), sizeof(Question));
-
-    
-
-
-
+    std::cout << "ID: " << header.id << std::endl;
+    std::cout << "Authoritative: " << (header.aa ? "yes" : "no") << std::endl;
+    std::cout << "Recursive: " << ((header.ra && header.rd) ? "yes" : "no") << std::endl;
 }
