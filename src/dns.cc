@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 
         sckt.send(msg.handover());
 
-        msg.recvMsg(sckt.recv());
+        msg.printMsg(sckt.recv());
 
         sckt.end();
     }

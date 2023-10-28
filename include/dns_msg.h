@@ -93,6 +93,6 @@ public:
 
     std::vector<uint8_t> handover(void);
 
-    void recvMsg(std::vector<uint8_t> response);
+    void printMsg(std::vector<uint8_t> response);
 
 };
