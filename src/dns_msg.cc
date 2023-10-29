@@ -139,6 +139,18 @@ void DnsMessage::printName(std::vector<uint8_t> response, uint16_t *offset)
     }
     (*offset)++;
 }
+void DnsMessage::print_address(std::vector<uint8_t> response, uint16_t *offset)
+{
+    uint16_t len = static_cast<uint16_t>(ntohs(answer.length));
+    uint16_t i;
+    for (i = 0; i < len; i++)
+    {
+        std::cout << static_cast<int>(response[(*offset) + i]);
+        if (i != (len-1))
+            std::cout << ".";
+    }
+    *offset += i;
+}
 
 void DnsMessage::printHeader(std::vector<uint8_t> response, uint16_t *offset)
 {
@@ -183,7 +195,7 @@ void DnsMessage::printAnswer(std::vector<uint8_t> response, uint16_t *offset)
     if (remapQType(ntohs(answer.type)) == "CNAME")
         printName(response, offset);
     else
-        std::cout << "addr";
+        print_address(response, offset);
 
     std::cout << std::endl;
 }

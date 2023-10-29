@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <random>
 #include <vector>
 #include <arpa/inet.h>
@@ -40,7 +39,7 @@ struct Question
     uint16_t qtype;
     uint16_t qclass;
 };
-#pragma pack(1)
+#pragma pack(1) // getting rid of unused padding
 struct ResourceRecord
 {
     uint16_t type;
@@ -69,6 +68,7 @@ private:
     void directAddress(std::string _);
     void reverseAddress(std::string _);
     void printName(std::vector<uint8_t> response, uint16_t *pos);
+    void print_address(std::vector<uint8_t> response, uint16_t *offset);
     void printHeader(std::vector<uint8_t> response, uint16_t *offset);
     void printQuestion(std::vector<uint8_t> response, uint16_t *offset);
     void printAnswer(std::vector<uint8_t> response, uint16_t *offset);
