@@ -139,16 +139,30 @@ void DnsMessage::printName(std::vector<uint8_t> response, uint16_t *offset)
     }
     (*offset)++;
 }
-void DnsMessage::print_address(std::vector<uint8_t> response, uint16_t *offset)
+void DnsMessage::printAddress(std::vector<uint8_t> response, uint16_t *offset, uint8_t type)
 {
     uint16_t len = static_cast<uint16_t>(ntohs(answer.length));
     uint16_t i;
-    for (i = 0; i < len; i++)
+    if (type == 6)
     {
-        std::cout << static_cast<int>(response[(*offset) + i]);
-        if (i != (len-1))
-            std::cout << ".";
+        for (i = 0; i < len; i += 2)
+        {
+            std::cout << std::hex << static_cast<int>(response[(*offset) + i]);
+            std::cout << std::hex << static_cast<int>(response[(*offset) + i + 1]);
+            if (i != (len - 1))
+                std::cout << ":";
+        }
     }
+    else
+    {
+        for (i = 0; i < len; i++)
+        {
+            std::cout << static_cast<int>(response[(*offset) + i]);
+            if (i != (len - 1))
+                std::cout << ".";
+        }
+    }
+
     *offset += i;
 }
 
@@ -168,36 +182,41 @@ void DnsMessage::printHeader(std::vector<uint8_t> response, uint16_t *offset)
 void DnsMessage::printQuestion(std::vector<uint8_t> response, uint16_t *offset)
 {
     std::cout << "Question(" << ntohs(header.q_count) << ")" << std::endl;
+    for (uint8_t i = 0; i < ntohs(header.q_count); i++)
+    {
+        printName(response, offset);
 
-    printName(response, offset);
+        memset(&question, 0, sizeof(Question));
+        memcpy(&question, response.data() + (*offset), sizeof(Question));
+        (*offset) += sizeof(Question);
 
-    memset(&question, 0, sizeof(Question));
-    memcpy(&question, response.data() + (*offset), sizeof(Question));
-    (*offset) += sizeof(Question);
-
-    std::cout << "," << remapQType(ntohs(question.qtype)) << "," << remapQClass(ntohs(question.qclass)) << std::endl;
+        std::cout << ", " << remapQType(ntohs(question.qtype)) << ", " << remapQClass(ntohs(question.qclass)) << std::endl;
+    }
 }
 
-void DnsMessage::printAnswer(std::vector<uint8_t> response, uint16_t *offset)
+void DnsMessage::printRR(std::vector<uint8_t> response, uint16_t *offset, uint16_t cnt)
 {
-    std::cout << "Answer(" << ntohs(header.ans_count) << ")" << std::endl;
 
-    printName(response, offset);
-
-    memset(&answer, 0, sizeof(ResourceRecord));
-    memcpy(&answer, response.data() + (*offset), sizeof(ResourceRecord));
-    (*offset) += sizeof(ResourceRecord);
-
-    std::cout << "," << remapQType(ntohs(answer.type));
-    std::cout << "," << remapQClass(ntohs(answer.Rclass));
-    std::cout << "," << ntohl(answer.ttl) << ",";
-
-    if (remapQType(ntohs(answer.type)) == "CNAME")
+    for (uint8_t i = 0; i < ntohs(cnt); i++)
+    {
         printName(response, offset);
-    else
-        print_address(response, offset);
 
-    std::cout << std::endl;
+        memset(&answer, 0, sizeof(ResourceRecord));
+        memcpy(&answer, response.data() + (*offset), sizeof(ResourceRecord));
+        (*offset) += sizeof(ResourceRecord);
+
+        std::cout << ", " << remapQType(ntohs(answer.type));
+        std::cout << ", " << remapQClass(ntohs(answer.Rclass));
+        std::cout << ", " << ntohl(answer.ttl) << ", ";
+
+        if (remapQType(ntohs(answer.type)) == "CNAME")
+            printName(response, offset);
+        if (remapQType(ntohs(answer.type)) == "A")
+            printAddress(response, offset, 4);
+        if (remapQType(ntohs(answer.type)) == "AAAA")
+            printAddress(response, offset, 6);
+        std::cout << std::endl;
+    }
 }
 
 void DnsMessage::printMsg(std::vector<uint8_t> response)
@@ -208,10 +227,14 @@ void DnsMessage::printMsg(std::vector<uint8_t> response)
     std::cout << std::endl;
 
     printQuestion(response, &offset);
-    printAnswer(response, &offset);
+    std::cout
+        << "Answer(" << ntohs(header.ans_count) << ")" << std::endl;
+    printRR(response, &offset, header.ans_count);
 
     std::cout
         << "Authority(" << ntohs(header.auth_count) << ")" << std::endl;
+    printRR(response, &offset, header.auth_count);
     std::cout
         << "Additional(" << ntohs(header.add_count) << ")" << std::endl;
+    printRR(response, &offset, header.add_count);
 }

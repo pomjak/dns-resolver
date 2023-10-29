@@ -68,12 +68,10 @@ private:
     void directAddress(std::string _);
     void reverseAddress(std::string _);
     void printName(std::vector<uint8_t> response, uint16_t *pos);
-    void print_address(std::vector<uint8_t> response, uint16_t *offset);
+    void printAddress(std::vector<uint8_t> response, uint16_t *offset, uint8_t type);
     void printHeader(std::vector<uint8_t> response, uint16_t *offset);
     void printQuestion(std::vector<uint8_t> response, uint16_t *offset);
-    void printAnswer(std::vector<uint8_t> response, uint16_t *offset);
-    void printAuth(std::vector<uint8_t> response, uint16_t *offset);
-    void printADd(std::vector<uint8_t> response, uint16_t *offset);
+    void printRR(std::vector<uint8_t> response, uint16_t *offset, uint16_t cnt);
 
 public:
     DnsMessage()
