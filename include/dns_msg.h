@@ -58,10 +58,6 @@ private:
 
     ResourceRecord answer;
 
-    ResourceRecord authority;
-
-    ResourceRecord additional;
-
     void setHeaderId(void);
     void setRecursion(bool _);
     void setClassAndType(bool ipv6, bool inverse);
@@ -79,8 +75,6 @@ public:
         memset(&header, 0, sizeof(struct Header));
         memset(&question, 0, sizeof(struct Question));
         memset(&answer, 0, sizeof(struct ResourceRecord));
-        memset(&authority, 0, sizeof(struct ResourceRecord));
-        memset(&additional, 0, sizeof(struct ResourceRecord));
 
         qname.clear();
     }

@@ -220,6 +220,7 @@ void DnsMessage::printRR(std::vector<uint8_t> response, uint16_t *offset, uint16
             printAddress(response, offset, 6);
         if (remapQType(ntohs(answer.type)) == "PTR")
             printName(response, offset);
+            
         std::cout << std::endl;
     }
 }
