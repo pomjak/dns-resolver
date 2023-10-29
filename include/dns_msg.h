@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include <random>
 #include <vector>
 #include <arpa/inet.h>
@@ -48,8 +49,6 @@ struct ResourceRecord
     uint16_t length;
 };
 
-
-
 class DnsMessage
 {
 
@@ -59,21 +58,22 @@ private:
     Question question;
 
     ResourceRecord answer;
-    std::vector<uint8_t> AnswerData;
 
-    ResourceRecord authority;    
-    std::vector<uint8_t> AuthorityData;
+    ResourceRecord authority;
 
-    ResourceRecord additional;    
-    std::vector<uint8_t> AdditionalData;
-
+    ResourceRecord additional;
 
     void setHeaderId(void);
     void setRecursion(bool _);
     void setClassAndType(bool ipv6, bool inverse);
     void directAddress(std::string _);
     void reverseAddress(std::string _);
-    
+    void printName(std::vector<uint8_t> response, uint16_t *pos);
+    void printHeader(std::vector<uint8_t> response, uint16_t *offset);
+    void printQuestion(std::vector<uint8_t> response, uint16_t *offset);
+    void printAnswer(std::vector<uint8_t> response, uint16_t *offset);
+    void printAuth(std::vector<uint8_t> response, uint16_t *offset);
+    void printADd(std::vector<uint8_t> response, uint16_t *offset);
 
 public:
     DnsMessage()
@@ -85,9 +85,6 @@ public:
         memset(&additional, 0, sizeof(struct ResourceRecord));
 
         qname.clear();
-        AnswerData.clear();
-        AuthorityData.clear();
-        AdditionalData.clear();
     }
 
     void constructMsg(param_parser *param);
@@ -95,5 +92,4 @@ public:
     std::vector<uint8_t> handover(void);
 
     void printMsg(std::vector<uint8_t> response);
-
 };

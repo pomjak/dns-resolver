@@ -3,7 +3,7 @@
 std::map<uint16_t, std::string> rcodeMap =
     {
         {0, "No error condition"},
-        {1, " Format error"},
+        {1, "Format error"},
         {2, "Server failure"},
         {3, "Name Error"},
         {4, "Not Implemented"},

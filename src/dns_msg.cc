@@ -113,42 +113,93 @@ std::vector<uint8_t> DnsMessage::handover(void)
     return buf;
 }
 
-void DnsMessage::printMsg(std::vector<uint8_t> response)
+void DnsMessage::printName(std::vector<uint8_t> response, uint16_t *offset)
 {
-    size_t offset = 0;
+    uint8_t i;
+    while (response[(*offset)] != 0x00) // end of name is 0x00
+    {
+        if (response[(*offset)] == 0xc0) // Message compression detected
+        {
+            uint16_t pos = static_cast<uint16_t>(response[(*offset)]) |
+                           (static_cast<uint16_t>(response[(*offset) + 1]) << 8); // concatenating 2xuint8_t to uint16_t
 
+            *offset += 2;
+            pos = ntohs(pos & 0xFF30); // getting rid of compress flag
+            printName(response, &pos);
+            return;
+        }
+
+        else
+        {
+            for (i = 1; i <= static_cast<uint8_t>(response[(*offset)]); i++)
+                std::cout << response[(*offset) + i];
+            std::cout << '.';
+            *offset += i;
+        }
+    }
+    (*offset)++;
+}
+
+void DnsMessage::printHeader(std::vector<uint8_t> response, uint16_t *offset)
+{
     memset(&header, 0, sizeof(Header));
     memcpy(&header, response.data(), sizeof(Header));
-    offset += sizeof(Header);
+    (*offset) += sizeof(Header);
 
-    std::cout << "ID: " << header.id << std::endl;
     std::cout << "Authoritative: " << (header.aa ? "yes" : "no") << std::endl;
     std::cout << "Recursive: " << ((header.ra && header.rd) ? "yes" : "no") << std::endl;
     std::cout << "Truncated: " << (header.tc ? "yes" : "no") << std::endl;
-    std::cout << "ERROR: " << remapRcode(header.rcode) << std::endl
-              << std::endl;
+    if (header.rcode)
+        std::cout << "ERROR: " << remapRcode(header.rcode) << std::endl;
+}
 
+void DnsMessage::printQuestion(std::vector<uint8_t> response, uint16_t *offset)
+{
     std::cout << "Question(" << ntohs(header.q_count) << ")" << std::endl;
 
-    int i;
-    while (response[offset] != 0)
-    {
-        for (i = 0; i <= static_cast<int>(response[offset]); i++)
-        {
-            std::cout << response[offset + i];
-        }
-        std::cout << ".";
-        offset += i;
-    }
-    offset++;
+    printName(response, offset);
 
     memset(&question, 0, sizeof(Question));
-    memcpy(&question, response.data() + offset, sizeof(Question));
-    offset += sizeof(Question);
+    memcpy(&question, response.data() + (*offset), sizeof(Question));
+    (*offset) += sizeof(Question);
 
     std::cout << "," << remapQType(ntohs(question.qtype)) << "," << remapQClass(ntohs(question.qclass)) << std::endl;
+}
 
+void DnsMessage::printAnswer(std::vector<uint8_t> response, uint16_t *offset)
+{
     std::cout << "Answer(" << ntohs(header.ans_count) << ")" << std::endl;
-    std::cout << "Authority(" << ntohs(header.auth_count) << ")" << std::endl;
-    std::cout << "Additional(" << ntohs(header.add_count) << ")" << std::endl;
+
+    printName(response, offset);
+
+    memset(&answer, 0, sizeof(ResourceRecord));
+    memcpy(&answer, response.data() + (*offset), sizeof(ResourceRecord) - 2);//-2 bcs of padding of structure
+    (*offset) += sizeof(ResourceRecord) - 2;
+
+    std::cout << "," << remapQType(ntohs(answer.type));
+    std::cout << "," << remapQClass(ntohs(answer.Rclass));
+    std::cout << "," << ntohl(answer.ttl) << ",";
+
+    if (remapQType(ntohs(answer.type)) == "CNAME")
+        printName(response, offset);
+    else
+        std::cout << "addr";
+
+    std::cout << std::endl;
+}
+
+void DnsMessage::printMsg(std::vector<uint8_t> response)
+{
+    uint16_t offset = 0;
+
+    printHeader(response, &offset);
+    std::cout << std::endl;
+
+    printQuestion(response, &offset);
+    printAnswer(response, &offset);
+
+    std::cout
+        << "Authority(" << ntohs(header.auth_count) << ")" << std::endl;
+    std::cout
+        << "Additional(" << ntohs(header.add_count) << ")" << std::endl;
 }
