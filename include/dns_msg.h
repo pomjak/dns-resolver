@@ -11,9 +11,9 @@
 //  16b      QR      [SET]   0 QUERY; 1 RESPONSE
 //  17-20b   OPCODE  [SET]   0 STANDARD; 1 INVERSE
 //  21b      AA      [READ]  AUTH ANS
-//  22b      TC      [READ]  TURNCATED
+//  22b      TC      [READ]  TRUNCATED
 //  23b      RD      [SET]   1 RECURS DESIRED; 0 NOT RECURS
-//  24b      RA      [READ]  RECURS AVAI
+//  24b      RA      [READ]  RECURS AVAILABLE
 //  25-27    Z       [SET]   000
 //  28-31    RCODE   [READ]  ERR CODE
 
@@ -28,22 +28,22 @@ struct Header
     uint16_t rcode : 4;
     uint16_t z : 3;
     uint16_t ra : 1;
-    uint16_t q_count;
-    uint16_t ans_count;
-    uint16_t auth_count;
-    uint16_t add_count;
+    uint16_t qCount;
+    uint16_t ansCount;
+    uint16_t authCount;
+    uint16_t addCount;
 };
 
 struct Question
 {
-    uint16_t qtype;
-    uint16_t qclass;
+    uint16_t qType;
+    uint16_t qClass;
 };
 #pragma pack(1) // getting rid of unused padding
 struct ResourceRecord
 {
     uint16_t type;
-    uint16_t Rclass;
+    uint16_t rClass;
     uint32_t ttl;
     uint16_t length;
 };

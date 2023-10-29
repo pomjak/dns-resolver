@@ -21,13 +21,13 @@ void DnsMessage::setRecursion(bool recursion)
 void DnsMessage::setClassAndType(bool ipv6, bool inverse)
 {
     if (inverse)
-        question.qtype = htons(12); // PTR
+        question.qType = htons(12); // PTR
     else if (ipv6)
-        question.qtype = htons(28); // AAAA
+        question.qType = htons(28); // AAAA
     else
-        question.qtype = htons(1); // A
+        question.qType = htons(1); // A
 
-    question.qclass = htons(1); // INternet class
+    question.qClass = htons(1); // INternet class
 }
 
 void DnsMessage::directAddress(std::string addr)
@@ -93,7 +93,7 @@ void DnsMessage::constructMsg(param_parser *param)
     else
         this->reverseAddress(param->get_address());
 
-    header.q_count = htons(1);
+    header.qCount = htons(1);
 }
 
 std::vector<uint8_t> DnsMessage::handover(void)
@@ -181,16 +181,18 @@ void DnsMessage::printHeader(std::vector<uint8_t> response, uint16_t *offset)
 
 void DnsMessage::printQuestion(std::vector<uint8_t> response, uint16_t *offset)
 {
-    std::cout << "Question(" << ntohs(header.q_count) << ")" << std::endl;
-    for (uint8_t i = 0; i < ntohs(header.q_count); i++)
+    std::cout << "Question(" << ntohs(header.qCount) << ")" << std::endl;
+    for (uint8_t i = 0; i < ntohs(header.qCount); i++)
     {
+        std::cout << "  ";
         printName(response, offset);
 
         memset(&question, 0, sizeof(Question));
         memcpy(&question, response.data() + (*offset), sizeof(Question));
         (*offset) += sizeof(Question);
 
-        std::cout << ", " << remapQType(ntohs(question.qtype)) << ", " << remapQClass(ntohs(question.qclass)) << std::endl;
+        std::cout << ", " << remapQType(ntohs(question.qType)) << ", "
+                  << remapQClass(ntohs(question.qClass)) << std::endl;
     }
 }
 
@@ -199,6 +201,7 @@ void DnsMessage::printRR(std::vector<uint8_t> response, uint16_t *offset, uint16
 
     for (uint8_t i = 0; i < ntohs(cnt); i++)
     {
+        std::cout << "  ";
         printName(response, offset);
 
         memset(&answer, 0, sizeof(ResourceRecord));
@@ -206,7 +209,7 @@ void DnsMessage::printRR(std::vector<uint8_t> response, uint16_t *offset, uint16
         (*offset) += sizeof(ResourceRecord);
 
         std::cout << ", " << remapQType(ntohs(answer.type));
-        std::cout << ", " << remapQClass(ntohs(answer.Rclass));
+        std::cout << ", " << remapQClass(ntohs(answer.rClass));
         std::cout << ", " << ntohl(answer.ttl) << ", ";
 
         if (remapQType(ntohs(answer.type)) == "CNAME")
@@ -215,6 +218,8 @@ void DnsMessage::printRR(std::vector<uint8_t> response, uint16_t *offset, uint16
             printAddress(response, offset, 4);
         if (remapQType(ntohs(answer.type)) == "AAAA")
             printAddress(response, offset, 6);
+        if (remapQType(ntohs(answer.type)) == "PTR")
+            printName(response, offset);
         std::cout << std::endl;
     }
 }
@@ -226,15 +231,18 @@ void DnsMessage::printMsg(std::vector<uint8_t> response)
     printHeader(response, &offset);
     std::cout << std::endl;
 
-    printQuestion(response, &offset);
-    std::cout
-        << "Answer(" << ntohs(header.ans_count) << ")" << std::endl;
-    printRR(response, &offset, header.ans_count);
+    if (!header.rcode)
+    {
+        printQuestion(response, &offset);
+        std::cout
+            << "Answer(" << ntohs(header.ansCount) << ")" << std::endl;
+        printRR(response, &offset, header.ansCount);
 
-    std::cout
-        << "Authority(" << ntohs(header.auth_count) << ")" << std::endl;
-    printRR(response, &offset, header.auth_count);
-    std::cout
-        << "Additional(" << ntohs(header.add_count) << ")" << std::endl;
-    printRR(response, &offset, header.add_count);
+        std::cout
+            << "Authority(" << ntohs(header.authCount) << ")" << std::endl;
+        printRR(response, &offset, header.authCount);
+        std::cout
+            << "Additional(" << ntohs(header.addCount) << ")" << std::endl;
+        printRR(response, &offset, header.addCount);
+    }
 }
