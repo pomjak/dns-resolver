@@ -73,6 +73,7 @@ private:
     void setClassAndType(bool ipv6, bool inverse);
     void directAddress(std::string _);
     void reverseAddress(std::string _);
+    
 
 public:
     DnsMessage()

@@ -1,4 +1,5 @@
 #include "dns_msg.h"
+#include "qmaps.h"
 
 void DnsMessage::setHeaderId(void)
 {
@@ -133,13 +134,13 @@ void DnsMessage::printMsg(std::vector<uint8_t> response)
     for (i = offset; i < response.size() && response[i]; i++)
         std::cout << response[i];
 
-    offset = i+1;
+    offset = i + 1;
 
     memset(&question, 0, sizeof(Question));
     memcpy(&question, response.data() + offset, sizeof(Question));
     offset += sizeof(Question);
 
-    std::cout << "," << ntohs(question.qtype) << "," << ntohs(question.qclass) << std::endl;
+    std::cout << "," << remapQType(ntohs(question.qtype)) << "," << remapQClass(ntohs(question.qclass)) << std::endl;
 
     std::cout << "Answer(" << ntohs(header.ans_count) << ")" << std::endl;
     std::cout << "Authority(" << ntohs(header.auth_count) << ")" << std::endl;
