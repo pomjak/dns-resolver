@@ -142,18 +142,20 @@ void DnsMessage::printName(std::vector<uint8_t> response, uint16_t *offset)
 void DnsMessage::printAddress(std::vector<uint8_t> response, uint16_t *offset, uint8_t type)
 {
     uint16_t len = static_cast<uint16_t>(ntohs(answer.length));
-    uint16_t i;
+    uint16_t i = 0;
     if (type == 6)
     {
         for (i = 0; i < len; i += 2)
         {
-            std::cout << std::hex << static_cast<int>(response[(*offset) + i]);
-            std::cout << std::hex << static_cast<int>(response[(*offset) + i + 1]);
-            if (i != (len - 1))
+            std::cout << std::hex << std::setw(2) << std::setfill('0')
+                      << static_cast<int>(response[(*offset) + i]);
+            std::cout << std::hex << std::setw(2) << std::setfill('0')
+                      << static_cast<int>(response[(*offset) + i + 1]);
+            if (i != (len - 2))
                 std::cout << ":";
         }
     }
-    else
+    if (type == 4)
     {
         for (i = 0; i < len; i++)
         {
@@ -220,7 +222,7 @@ void DnsMessage::printRR(std::vector<uint8_t> response, uint16_t *offset, uint16
             printAddress(response, offset, 6);
         if (remapQType(ntohs(answer.type)) == "PTR")
             printName(response, offset);
-            
+
         std::cout << std::endl;
     }
 }
