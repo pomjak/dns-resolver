@@ -173,8 +173,8 @@ void DnsMessage::printAnswer(std::vector<uint8_t> response, uint16_t *offset)
     printName(response, offset);
 
     memset(&answer, 0, sizeof(ResourceRecord));
-    memcpy(&answer, response.data() + (*offset), sizeof(ResourceRecord) - 2);//-2 bcs of padding of structure
-    (*offset) += sizeof(ResourceRecord) - 2;
+    memcpy(&answer, response.data() + (*offset), sizeof(ResourceRecord));
+    (*offset) += sizeof(ResourceRecord);
 
     std::cout << "," << remapQType(ntohs(answer.type));
     std::cout << "," << remapQClass(ntohs(answer.Rclass));

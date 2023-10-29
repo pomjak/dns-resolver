@@ -40,7 +40,7 @@ struct Question
     uint16_t qtype;
     uint16_t qclass;
 };
-
+#pragma pack(1)
 struct ResourceRecord
 {
     uint16_t type;
@@ -48,7 +48,7 @@ struct ResourceRecord
     uint32_t ttl;
     uint16_t length;
 };
-
+#pragma pack()
 class DnsMessage
 {
 
