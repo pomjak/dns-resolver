@@ -124,17 +124,23 @@ void DnsMessage::printMsg(std::vector<uint8_t> response)
     std::cout << "ID: " << header.id << std::endl;
     std::cout << "Authoritative: " << (header.aa ? "yes" : "no") << std::endl;
     std::cout << "Recursive: " << ((header.ra && header.rd) ? "yes" : "no") << std::endl;
-    std::cout << "Truncated: " << (header.tc ? "yes" : "no") << std::endl
+    std::cout << "Truncated: " << (header.tc ? "yes" : "no") << std::endl;
+    std::cout << "ERROR: " << remapRcode(header.rcode) << std::endl
               << std::endl;
 
     std::cout << "Question(" << ntohs(header.q_count) << ")" << std::endl;
-    std::cout << '\t';
 
-    size_t i;
-    for (i = offset; i < response.size() && response[i]; i++)
-        std::cout << response[i];
-
-    offset = i + 1;
+    int i;
+    while (response[offset] != 0)
+    {
+        for (i = 0; i <= static_cast<int>(response[offset]); i++)
+        {
+            std::cout << response[offset + i];
+        }
+        std::cout << ".";
+        offset += i;
+    }
+    offset++;
 
     memset(&question, 0, sizeof(Question));
     memcpy(&question, response.data() + offset, sizeof(Question));
