@@ -168,6 +168,23 @@ void DnsMessage::printAddress(std::vector<uint8_t> response, uint16_t *offset, u
     *offset += i;
 }
 
+void DnsMessage::printSOA(std::vector<uint8_t> response, uint16_t *offset)
+{
+    printName(response, offset);
+    std::cout << ", ";
+    printName(response, offset);
+
+    uint32_t soaData;
+
+    for (int i = 0; i < 5; i++)
+    {
+        std::cout << ", ";
+        memcpy(&soaData, response.data() + (*offset), sizeof(soaData));
+        (*offset) += sizeof(soaData);
+        std::cout << ntohl(soaData);
+    }
+}
+
 void DnsMessage::printHeader(std::vector<uint8_t> response, uint16_t *offset)
 {
     memset(&header, 0, sizeof(Header));
@@ -222,8 +239,11 @@ void DnsMessage::printRR(std::vector<uint8_t> response, uint16_t *offset, uint16
             printAddress(response, offset, 6);
         if (remapQType(ntohs(answer.type)) == "PTR")
             printName(response, offset);
+        if ((remapQType(ntohs(answer.type)) == "SOA"))
+            printSOA(response, offset);
 
-        std::cout << std::endl;
+        std::cout
+            << std::endl;
     }
 }
 
