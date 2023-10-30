@@ -81,7 +81,7 @@ void DnsMessage::reverseAddress(std::string addr)
 
 void DnsMessage::reverseAddressV6(std::string addrV6)
 {
-    
+
     uint8_t NoQuartets = 38; // number of quartets + ':'
     for (int i = NoQuartets; i >= 0; i--)
     {
@@ -264,16 +264,18 @@ void DnsMessage::printRR(std::vector<uint8_t> response, uint16_t *offset, uint16
         std::cout << ", " << remapQClass(ntohs(answer.rClass));
         std::cout << ", " << ntohl(answer.ttl) << ", ";
 
-        if (remapQType(ntohs(answer.type)) == "CNAME")
-            printName(response, offset);
         if (remapQType(ntohs(answer.type)) == "A")
             printAddress(response, offset, 4);
         if (remapQType(ntohs(answer.type)) == "AAAA")
             printAddress(response, offset, 6);
+        if (remapQType(ntohs(answer.type)) == "CNAME")
+            printName(response, offset);
         if (remapQType(ntohs(answer.type)) == "PTR")
             printName(response, offset);
         if ((remapQType(ntohs(answer.type)) == "SOA"))
             printSOA(response, offset);
+        if (remapQType(ntohs(answer.type)) == "NS")
+            printName(response, offset);
 
         std::cout
             << std::endl;
@@ -287,18 +289,15 @@ void DnsMessage::printMsg(std::vector<uint8_t> response)
     printHeader(response, &offset);
     std::cout << std::endl;
 
-    // if (!header.rcode)
-    // {
-        printQuestion(response, &offset);
-        std::cout
-            << "Answer(" << ntohs(header.ansCount) << ")" << std::endl;
-        printRR(response, &offset, header.ansCount);
+    printQuestion(response, &offset);
+    std::cout
+        << "Answer(" << ntohs(header.ansCount) << ")" << std::endl;
+    printRR(response, &offset, header.ansCount);
 
-        std::cout
-            << "Authority(" << ntohs(header.authCount) << ")" << std::endl;
-        printRR(response, &offset, header.authCount);
-        std::cout
-            << "Additional(" << ntohs(header.addCount) << ")" << std::endl;
-        printRR(response, &offset, header.addCount);
-    // }
+    std::cout
+        << "Authority(" << ntohs(header.authCount) << ")" << std::endl;
+    printRR(response, &offset, header.authCount);
+    std::cout
+        << "Additional(" << ntohs(header.addCount) << ")" << std::endl;
+    printRR(response, &offset, header.addCount);
 }

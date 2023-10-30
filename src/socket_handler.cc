@@ -13,7 +13,7 @@ void communicate::start(param_parser *param)
     server_addr.sin_port = htons(param->get_port());
 
     if (inet_pton(AF_INET, param->get_server().c_str(), &server_addr.sin_addr) <= 0)
-        throw std::runtime_error("converting to network fromat failed");
+        throw std::runtime_error("converting to network format failed");
 }
 
 void communicate::send(std::vector<uint8_t> msg)
