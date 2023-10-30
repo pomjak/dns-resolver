@@ -220,10 +220,13 @@ void DnsMessage::printSOA(std::vector<uint8_t> response, uint16_t *offset)
 
 void DnsMessage::printHeader(std::vector<uint8_t> response, uint16_t *offset)
 {
+    uint16_t id =header.id;
     memset(&header, 0, sizeof(Header));
     memcpy(&header, response.data(), sizeof(Header));
     (*offset) += sizeof(Header);
-
+    if(id != header.id)
+        std::cout << "Header ID does not match" << std::endl;
+        
     std::cout << "Authoritative: " << (header.aa ? "yes" : "no") << std::endl;
     std::cout << "Recursive: " << ((header.ra && header.rd) ? "yes" : "no") << std::endl;
     std::cout << "Truncated: " << (header.tc ? "yes" : "no") << std::endl;
