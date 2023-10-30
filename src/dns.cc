@@ -18,9 +18,9 @@ int main(int argc, char **argv)
 
         msg.constructMsg(&param);
 
-        sckt.send(msg.handover());
+        sckt.sendQuery(msg.handover());
 
-        msg.printMsg(sckt.recv());
+        msg.printMsg(sckt.recvResponse());
 
         sckt.end();
     }
