@@ -5,7 +5,7 @@ std::map<uint16_t, std::string> rcodeMap =
         {0, "No error condition"},
         {1, "Format error"},
         {2, "Server failure"},
-        {3, "Name Error"},
+        {3, "Name Error [No such name]"},
         {4, "Not Implemented"},
         {5, "Refused"}};
 

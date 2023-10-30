@@ -79,6 +79,34 @@ void DnsMessage::reverseAddress(std::string addr)
     qname.push_back(0);
 }
 
+void DnsMessage::reverseAddressV6(std::string addrV6)
+{
+    
+    uint8_t NoQuartets = 38; // number of quartets + ':'
+    for (int i = NoQuartets; i >= 0; i--)
+    {
+        if (addrV6[i] != ':')
+        {
+            qname.push_back(static_cast<uint8_t>(1));
+            qname.push_back(static_cast<uint8_t>(addrV6[i]));
+        }
+    }
+
+    std::string suffix = "ip6.arpa";
+    std::stringstream sss(suffix);
+    std::string temp;
+
+    while (std::getline(sss, temp, '.'))
+    {
+        qname.push_back(static_cast<uint8_t>(temp.length()));
+
+        for (char c : temp)
+            qname.push_back(static_cast<uint8_t>(c));
+    }
+
+    qname.push_back(0);
+}
+
 void DnsMessage::constructMsg(param_parser *param)
 {
     this->setHeaderId();
@@ -89,9 +117,14 @@ void DnsMessage::constructMsg(param_parser *param)
     this->setClassAndType(param->get_ipv6(), param->get_reverse());
 
     if (!(param->get_reverse()))
-        this->directAddress(param->get_address());
+        this->directAddress(param->get_address()); // store normal DN
     else
-        this->reverseAddress(param->get_address());
+    {
+        if (param->get_ipv6())
+            this->reverseAddressV6(param->get_address());
+        else
+            this->reverseAddress(param->get_address()); // store reversed ip addr
+    }
 
     header.qCount = htons(1);
 }
@@ -131,7 +164,7 @@ void DnsMessage::printName(std::vector<uint8_t> response, uint16_t *offset)
 
         else
         {
-            for (i = 1; i <= static_cast<uint8_t>(response[(*offset)]); i++)
+            for (i = 1; i <= static_cast<uint8_t>(response[(*offset)]); i++) // number of chars is stored at response[offset]
                 std::cout << response[(*offset) + i];
             std::cout << '.';
             *offset += i;
@@ -254,8 +287,8 @@ void DnsMessage::printMsg(std::vector<uint8_t> response)
     printHeader(response, &offset);
     std::cout << std::endl;
 
-    if (!header.rcode)
-    {
+    // if (!header.rcode)
+    // {
         printQuestion(response, &offset);
         std::cout
             << "Answer(" << ntohs(header.ansCount) << ")" << std::endl;
@@ -267,5 +300,5 @@ void DnsMessage::printMsg(std::vector<uint8_t> response)
         std::cout
             << "Additional(" << ntohs(header.addCount) << ")" << std::endl;
         printRR(response, &offset, header.addCount);
-    }
+    // }
 }
