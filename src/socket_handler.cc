@@ -6,21 +6,29 @@
 
 void communicate::start(param_parser *param)
 {
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(param->get_port());
 
-    if (inet_pton(AF_INET, param->get_server().c_str(), &server_addr.sin_addr) <= 0)
-        throw std::runtime_error("converting to network format failed");
+    server.sin_family = AF_UNSPEC;
+    server.sin_port = htons(param->get_port());
 
-    if ((this->resolver_socket = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    int status = getaddrinfo(param->get_server().c_str(), (std::to_string(param->get_port()).c_str()), &DomainName, &res);
+
+    if (status != 0)
+    {
+        throw std::runtime_error("resolving ip addr of dns server failed");
+    }
+
+    // if (inet_pton(AF_INET, param->get_server().c_str(), &server.sin_addr) <= 0)
+    //     throw std::runtime_error("converting to network format failed");
+
+    if ((this->resolver_socket = socket(result->ai_addr,result->ai_socktype ,result->ai_protocol)) < 0)
         throw std::runtime_error("creating new socket failed" + std::string(strerror(errno)));
-    len = sizeof(server_addr);
+    len = sizeof(server);
     fromlen = sizeof(from);
 }
 
 void communicate::sendQuery(std::vector<uint8_t> msg)
 {
-    if (connect(resolver_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
+    if (connect(resolver_socket, (struct sockaddr *)&server, sizeof(server)) == -1)
         throw std::runtime_error("connect failed" + std::string(strerror(errno)));
 
     int bytesTx = send(this->resolver_socket, msg.data(), msg.size(), MSG_CONFIRM);
@@ -33,7 +41,6 @@ void communicate::sendQuery(std::vector<uint8_t> msg)
 
 std::vector<uint8_t> communicate::recvResponse(void)
 {
-    socklen_t len;
     char response[UDP_LIMIT];
     size_t bytesRead;
 
