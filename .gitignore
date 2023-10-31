@@ -33,4 +33,5 @@
 
 # Vscode folders
 .vscode/
+test-build/
 dns
