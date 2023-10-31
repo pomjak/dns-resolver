@@ -11,14 +11,14 @@
 
 class communicate {
     private:
-        int resolver_socket;
-        struct sockaddr_in server_addr,from;
+        int resolverSocket;
+        struct sockaddr_in serverAddr,from;
         socklen_t len, fromlen;
 
     public:
         communicate()
         {
-            this->resolver_socket=-1;
+            this->resolverSocket=-1;
         }
         void start(param_parser *param);
         void sendQuery(std::vector<uint8_t> msg);

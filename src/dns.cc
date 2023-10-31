@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 
     try
     {
-        param.process_params(argc, argv);
+        param.processParams(argc, argv);
 
         sckt.start(&param); 
 

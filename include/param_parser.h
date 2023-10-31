@@ -15,17 +15,17 @@ private:
         int port;
         std::string address;
     
-    void set_recursion(bool r) { this->recursion = r; }
+    void setRecursion(bool r) { this->recursion = r; }
 
-    void set_reverse(bool x) { this->reverse = x; }
+    void setReverse(bool x) { this->reverse = x; }
 
-    void set_ipv6(bool ip) { this->ipv6 = ip; }
+    void setIPv6(bool ip) { this->ipv6 = ip; }
 
-    void set_server(std::string s) { this->server = s; }
+    void setServer(std::string s) { this->server = s; }
 
-    void set_port(int p) { this->port = p; }
+    void setPort(int p) { this->port = p; }
 
-    void set_address(std::string a) { this->address = a; }
+    void setAddress(std::string a) { this->address = a; }
 
 public:
     param_parser()
@@ -38,17 +38,17 @@ public:
         this->address = "";
     }
 
-    void process_params(int argc, char **argv);
+    void processParams(int argc, char **argv);
 
-    bool get_recursion(void) { return this->recursion; }
+    bool getRecursion(void) { return this->recursion; }
 
-    bool get_reverse(void) { return this->reverse; }
+    bool getReverse(void) { return this->reverse; }
 
-    bool get_ipv6(void) { return this->ipv6; }
+    bool getIPv6(void) { return this->ipv6; }
 
-    std::string get_server(void) { return this->server; }
+    std::string getServer(void) { return this->server; }
 
-    int get_port(void) { return this->port; }
+    int getPort(void) { return this->port; }
 
-    std::string get_address(void) { return this->address; }
+    std::string getAddress(void) { return this->address; }
 };

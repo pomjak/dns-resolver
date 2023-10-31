@@ -111,19 +111,19 @@ void DnsMessage::constructMsg(param_parser *param)
 {
     this->setHeaderId();
 
-    if (param->get_recursion())
+    if (param->getRecursion())
         this->setRecursion(true);
 
-    this->setClassAndType(param->get_ipv6(), param->get_reverse());
+    this->setClassAndType(param->getIPv6(), param->getReverse());
 
-    if (!(param->get_reverse()))
-        this->directAddress(param->get_address()); // store normal DN
+    if (!(param->getReverse()))
+        this->directAddress(param->getAddress()); // store normal DN
     else
     {
-        if (param->get_ipv6())
-            this->reverseAddressV6(param->get_address());
+        if (param->getIPv6())
+            this->reverseAddressV6(param->getAddress());
         else
-            this->reverseAddress(param->get_address()); // store reversed ip addr
+            this->reverseAddress(param->getAddress()); // store reversed ip addr
     }
 
     header.qCount = htons(1);
@@ -220,13 +220,14 @@ void DnsMessage::printSOA(std::vector<uint8_t> response, uint16_t *offset)
 
 void DnsMessage::printHeader(std::vector<uint8_t> response, uint16_t *offset)
 {
-    uint16_t id =header.id;
+    uint16_t id = header.id;
     memset(&header, 0, sizeof(Header));
     memcpy(&header, response.data(), sizeof(Header));
+
     (*offset) += sizeof(Header);
-    if(id != header.id)
+    if (id != header.id)
         std::cout << "Header ID does not match" << std::endl;
-        
+
     std::cout << "Authoritative: " << (header.aa ? "yes" : "no") << std::endl;
     std::cout << "Recursive: " << ((header.ra && header.rd) ? "yes" : "no") << std::endl;
     std::cout << "Truncated: " << (header.tc ? "yes" : "no") << std::endl;

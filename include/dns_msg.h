@@ -55,6 +55,7 @@ class DnsMessage
 private:
     Header header;
     std::vector<uint8_t> qname;
+    
     Question question;
 
     ResourceRecord answer;

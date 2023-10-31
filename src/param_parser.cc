@@ -1,6 +1,6 @@
 #include "param_parser.h"
 
-void param_parser::process_params(int argc, char **argv)
+void param_parser::processParams(int argc, char **argv)
 {
     int opt;
 
@@ -12,23 +12,23 @@ void param_parser::process_params(int argc, char **argv)
         switch (opt)
         {
         case 'r':
-            this->set_recursion(true);
+            this->setRecursion(true);
             break;
 
         case 'x':
-            this->set_reverse(true);
+            this->setReverse(true);
             break;
 
         case '6':
-            this->set_ipv6(true);
+            this->setIPv6(true);
             break;
 
         case 's':
-            this->set_server(optarg);
+            this->setServer(optarg);
             break;
 
         case 'p':
-            this->set_port(std::stoi(optarg));
+            this->setPort(std::stoi(optarg));
             break;
 
         default:
@@ -38,10 +38,10 @@ void param_parser::process_params(int argc, char **argv)
     }
 
     if (optind < argc)
-        this->set_address(argv[optind]);
+        this->setAddress(argv[optind]);
     else
         throw std::invalid_argument("Address must be set");
 
-    if (get_server() == "")
+    if (getServer() == "")
         throw std::invalid_argument("Server address must be set");
 }
