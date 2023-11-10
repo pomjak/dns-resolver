@@ -27,10 +27,10 @@ void DnsMessage::setRecursion(bool recursion)
 }
 
 /**
- * @brief Sets the DNS question class and type based on the given parameters.
+ * @brief sets the DNS question class and type based on the given parameters.
  *
- * @param ipv6 A boolean indicating whether the query is for an IPv6 address.
- * @param inverse A boolean indicating whether to use the inverse query type (PTR).
+ * @param ipv6 indicating whether the query is for an IPv6 address.
+ * @param inverse indicating whether to use the inverse query type (PTR).
  */
 void DnsMessage::setClassAndType(bool ipv6, bool inverse)
 {
@@ -41,23 +41,33 @@ void DnsMessage::setClassAndType(bool ipv6, bool inverse)
         question.qType = ipv6 ? htons(28) : htons(1); // AAAA if ipv6, A otherwise
 }
 
-void DnsMessage::directAddress(std::string addr)
+/**
+ * @brief encodes a direct address into the qname vector.
+ *
+ * @param addr
+ */
+void DnsMessage::directAddress(const std::string &addr)
 {
     std::stringstream ss(addr);
 
     std::string label;
 
-    while (std::getline(ss, label, '.'))
+    while (std::getline(ss, label, '.')) // parsing string with delimeter .
     {
-        qname.push_back(static_cast<uint8_t>(label.length()));
+        qname.push_back(static_cast<uint8_t>(label.length())); // storing length of label before storing label
 
         for (char c : label)
-            qname.push_back(static_cast<uint8_t>(c));
+            qname.push_back(static_cast<uint8_t>(c)); // storing label by one char
     }
 
-    qname.push_back(0);
+    qname.push_back(0); // null byte indicating end of label
 }
 
+/**
+ * @brief encodes a reverse address into the qname vector.
+ *
+ * @param addr IPv4 address to be encoded in reverse DNS format.
+ */
 void DnsMessage::reverseAddress(std::string addr)
 {
     std::stringstream ssa(addr);
@@ -65,9 +75,11 @@ void DnsMessage::reverseAddress(std::string addr)
     std::string octet[4];
     std::string temp;
 
+    // tokenize IPv4 address into octets
     for (int i = 0; std::getline(ssa, octet[i], '.'); i++)
         ;
 
+    // traverse octets in reverse order
     for (int i = 3; i >= 0; i--)
     {
         qname.push_back(static_cast<uint8_t>(octet[i].length()));
@@ -76,6 +88,7 @@ void DnsMessage::reverseAddress(std::string addr)
             qname.push_back(static_cast<uint8_t>(c));
     }
 
+    // append 'in-addr.arpa' suffix
     std::string suffix = "in-addr.arpa";
     std::stringstream sss(suffix);
 
@@ -87,22 +100,28 @@ void DnsMessage::reverseAddress(std::string addr)
             qname.push_back(static_cast<uint8_t>(c));
     }
 
+    // null byte indicating end of addr
     qname.push_back(0);
 }
 
-void DnsMessage::reverseAddressV6(std::string addrV6)
+/**
+ * @brief encodes a reverse IPv6 address into the qname vector.
+ *
+ * @param addrV6 IPv6 address traversed in reverse DNS format.
+ */
+void DnsMessage::reverseAddressV6(const std::string &addrV6)
 {
-
     uint8_t NoQuartets = 38; // number of quartets + ':'
+
     for (int i = NoQuartets; i >= 0; i--)
     {
         if (addrV6[i] != ':')
         {
-            qname.push_back(static_cast<uint8_t>(1));
-            qname.push_back(static_cast<uint8_t>(addrV6[i]));
+            qname.push_back(static_cast<uint8_t>(1));           // length is always 1
+            qname.push_back(static_cast<uint8_t>(addrV6[i]));   // storing addr per byte    
         }
     }
-
+    // append 'ip6.arpa' suffix
     std::string suffix = "ip6.arpa";
     std::stringstream sss(suffix);
     std::string temp;
@@ -117,24 +136,28 @@ void DnsMessage::reverseAddressV6(std::string addrV6)
 
     qname.push_back(0);
 }
-
+/**
+ * @brief constructs a DNS message based on the provided parameters.
+ *
+ * @param param param_parser object containing parameters for constructing the DNS message.
+ */
 void DnsMessage::constructMsg(param_parser *param)
 {
-    this->setHeaderId();
+    setHeaderId();
 
     if (param->getRecursion())
-        this->setRecursion(true);
+        setRecursion(true);
 
-    this->setClassAndType(param->getIPv6(), param->getReverse());
+    setClassAndType(param->getIPv6(), param->getReverse());
 
     if (!(param->getReverse()))
-        this->directAddress(param->getAddress()); // store normal DN
+        directAddress(param->getAddress()); // store normal DA
     else
     {
         if (param->getIPv6())
-            this->reverseAddressV6(param->getAddress());
+            reverseAddressV6(param->getAddress());
         else
-            this->reverseAddress(param->getAddress()); // store reversed ip addr
+            reverseAddress(param->getAddress()); // store reversed ip addr
     }
 
     header.qCount = htons(1);

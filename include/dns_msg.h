@@ -63,9 +63,9 @@ private:
     void setHeaderId(void);
     void setRecursion(bool _);
     void setClassAndType(bool ipv6, bool inverse);
-    void directAddress(std::string _);
+    void directAddress(const std::string& _);
     void reverseAddress(std::string _);
-    void reverseAddressV6(std::string addrV6);
+    void reverseAddressV6(const std::string &addrV6);
     void printName(std::vector<uint8_t> response, uint16_t *pos);
     void printSOA(std::vector<uint8_t> response, uint16_t *offset);
     void printAddress(std::vector<uint8_t> response, uint16_t *offset, uint8_t type);
