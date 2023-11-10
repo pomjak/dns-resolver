@@ -23,7 +23,7 @@ debug:$(SRC)
 
 clean:
 	$(RM) $(OBJS) test-build
-
+	$(RM) vgcore.*
 test:
 	rm -rf       	test-build/
 	mkdir 			test-build/
