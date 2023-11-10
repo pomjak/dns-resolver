@@ -70,8 +70,8 @@ private:
     void printSOA(const std::vector<uint8_t> &response, uint16_t *offset);
     void printAddress(const std::vector<uint8_t> &response, uint16_t *offset, uint8_t type);
     void printHeader(const std::vector<uint8_t> &response, uint16_t *offset);
-    void printQuestion(std::vector<uint8_t> response, uint16_t *offset);
-    void printRR(std::vector<uint8_t> response, uint16_t *offset, uint16_t cnt);
+    void printQuestion(const std::vector<uint8_t> &response, uint16_t *offset);
+    void printRR(const std::vector<uint8_t> &response, uint16_t *offset, uint16_t cnt);
 
 public:
     DnsMessage()
@@ -87,5 +87,5 @@ public:
 
     std::vector<uint8_t> handover(void) const;
 
-    void printMsg(std::vector<uint8_t> response);
+    void printMsg(const std::vector<uint8_t> &response);
 };

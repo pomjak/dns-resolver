@@ -206,7 +206,7 @@ void DnsMessage::printName(const std::vector<uint8_t> &response, uint16_t *offse
             printName(response, &pos);
             return;
         }
-        else//print name directly
+        else // print name directly
         {
             uint8_t labelLength = response[*offset];
             for (i = 1; i <= labelLength; i++)
@@ -303,14 +303,22 @@ void DnsMessage::printHeader(const std::vector<uint8_t> &response, uint16_t *off
         std::cout << ", ERROR: " << remapRcode(header.rcode);
 }
 
-void DnsMessage::printQuestion(std::vector<uint8_t> response, uint16_t *offset)
+/**
+ * @brief prints information related to the DNS message's question section from the response buffer.
+ *
+ * @param response  vector containing the DNS response.
+ * @param offset pointer to the offset within the response buffer.
+ */
+void DnsMessage::printQuestion(const std::vector<uint8_t> &response, uint16_t *offset)
 {
     std::cout << "Question section (" << ntohs(header.qCount) << ")" << std::endl;
+
     for (uint8_t i = 0; i < ntohs(header.qCount); i++)
     {
         std::cout << "  ";
         printName(response, offset);
 
+        // reset question and copy from response
         memset(&question, 0, sizeof(Question));
         memcpy(&question, response.data() + (*offset), sizeof(Question));
         (*offset) += sizeof(Question);
@@ -320,56 +328,67 @@ void DnsMessage::printQuestion(std::vector<uint8_t> response, uint16_t *offset)
     }
 }
 
-void DnsMessage::printRR(std::vector<uint8_t> response, uint16_t *offset, uint16_t cnt)
+/**
+ * @brief prints information related to DNS resource records from the response buffer.
+ *
+ * @param response  vector containing the DNS response.
+ * @param offset pointer to the offset within the response buffer.
+ * @param cnt count of resource records to print.
+ */
+void DnsMessage::printRR(const std::vector<uint8_t> &response, uint16_t *offset, uint16_t cnt)
 {
-
     for (uint8_t i = 0; i < ntohs(cnt); i++)
     {
         std::cout << "  ";
         printName(response, offset);
 
+        // reset answer and copy from response
         memset(&answer, 0, sizeof(ResourceRecord));
         memcpy(&answer, response.data() + (*offset), sizeof(ResourceRecord));
         (*offset) += sizeof(ResourceRecord);
 
-        std::cout << ", " << remapQType(ntohs(answer.type));
-        std::cout << ", " << remapQClass(ntohs(answer.rClass));
-        std::cout << ", " << std::dec << static_cast<uint32_t>(ntohl(answer.ttl)) << ", ";
+        std::cout << ", " << remapQType(ntohs(answer.type))
+                  << ", " << remapQClass(ntohs(answer.rClass))
+                  << ", " << std::dec << static_cast<uint32_t>(ntohl(answer.ttl)) << ", ";
 
-        if (remapQType(ntohs(answer.type)) == "A")
-            printAddress(response, offset, 4);
-        if (remapQType(ntohs(answer.type)) == "AAAA")
-            printAddress(response, offset, 6);
-        if (remapQType(ntohs(answer.type)) == "CNAME")
+        if (auto type = remapQType(ntohs(answer.type)); type == "A" || type == "AAAA")
+            printAddress(response, offset, (type == "A") ? 4 : 6);
+
+        else if (type == "CNAME" || type == "PTR" || type == "NS")
             printName(response, offset);
-        if (remapQType(ntohs(answer.type)) == "PTR")
-            printName(response, offset);
-        if ((remapQType(ntohs(answer.type)) == "SOA"))
+
+        else if (type == "SOA")
             printSOA(response, offset);
-        if (remapQType(ntohs(answer.type)) == "NS")
-            printName(response, offset);
 
-        std::cout
-            << std::endl;
+        std::cout << std::endl;
     }
 }
 
-void DnsMessage::printMsg(std::vector<uint8_t> response)
+/**
+ * @brief prints information related to a DNS message from the response buffer.
+ *
+ * @param response The vector containing the DNS response.
+ */
+void DnsMessage::printMsg(const std::vector<uint8_t> &response)
 {
     uint16_t offset = 0;
 
+    // Print header
     printHeader(response, &offset);
     std::cout << std::endl;
 
+    // Print question section
     printQuestion(response, &offset);
-    std::cout
-        << "Answer section (" << ntohs(header.ansCount) << ")" << std::endl;
+
+    // Print answer section
+    std::cout << "Answer section (" << ntohs(header.ansCount) << ")" << std::endl;
     printRR(response, &offset, header.ansCount);
 
-    std::cout
-        << "Authority section(" << ntohs(header.authCount) << ")" << std::endl;
+    // Print authority section
+    std::cout << "Authority section (" << ntohs(header.authCount) << ")" << std::endl;
     printRR(response, &offset, header.authCount);
-    std::cout
-        << "Additional section(" << ntohs(header.addCount) << ")" << std::endl;
+
+    // Print additional section
+    std::cout << "Additional section (" << ntohs(header.addCount) << ")" << std::endl;
     printRR(response, &offset, header.addCount);
 }
