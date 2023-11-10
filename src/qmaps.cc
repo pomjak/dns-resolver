@@ -2,12 +2,12 @@
 
 std::map<uint16_t, std::string> rcodeMap =
     {
-        {0, "No error condition"},
-        {1, "Format error"},
-        {2, "Server failure"},
-        {3, "Name Error [No such name]"},
-        {4, "Not Implemented"},
-        {5, "Refused"}};
+        {0, "No error condition "},
+        {1, "Format error "},
+        {2, "Server failure "},
+        {3, "Name Error [No such name] "},
+        {4, "Not Implemented "},
+        {5, "Refused "}};
 
 std::map<uint16_t, std::string> qclassMap =
     {
@@ -19,7 +19,7 @@ std::map<uint16_t, std::string> qclassMap =
 std::map<uint16_t, std::string> qtypeMap =
     {
         {1, "A"},
-        {1, "NS"},
+        {2, "NS"},
         {3, "MD"},
         {4, "MF"},
         {5, "CNAME"},

@@ -7,22 +7,22 @@
 int main(int argc, char **argv)
 {
     param_parser param;
-    communicate sckt;
+    communicate socket;
     DnsMessage msg;
 
     try
     {
         param.processParams(argc, argv);
 
-        sckt.start(&param);
+        socket.start(&param);
 
         msg.constructMsg(&param);
 
-        sckt.sendQuery(msg.handover());
+        socket.sendQuery(msg.handover());
 
-        msg.printMsg(sckt.recvResponse());
+        msg.printMsg(socket.recvResponse());
 
-        sckt.end();
+        socket.end();
     }
 
     catch (const std::invalid_argument &e)

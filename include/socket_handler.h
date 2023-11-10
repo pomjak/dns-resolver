@@ -1,6 +1,7 @@
 #pragma once 
 
 #include <arpa/inet.h>
+#include <netdb.h>
 #include <sys/socket.h>
 #include <cstring>
 #include <cerrno>
@@ -14,6 +15,8 @@ class communicate {
         int resolverSocket;
         struct sockaddr_in serverAddr,from;
         socklen_t len, fromlen;
+        struct hostent *host_info;
+        struct in_addr addr;
 
     public:
         communicate()

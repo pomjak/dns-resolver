@@ -9,8 +9,25 @@ void communicate::start(param_parser *param)
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(param->getPort());
 
-    if (inet_pton(AF_INET, param->getServer().c_str(), &serverAddr.sin_addr) <= 0)
-        throw std::runtime_error("converting to network format failed : ");
+    host_info = gethostbyname(param->getServer().c_str());
+
+    if (host_info == NULL)
+        throw std::runtime_error("server ip not found : ");
+
+    for (int i = 0; host_info->h_addr_list[i]; i++)
+    {
+        memcpy(&addr, host_info->h_addr_list[i], sizeof(struct in_addr));
+
+        if (inet_pton(AF_INET, inet_ntoa(addr), &serverAddr.sin_addr) <= 0)
+        {
+            if (host_info->h_addr_list[i + 1] == NULL)
+                throw std::runtime_error("converting to network format failed : ");
+            else
+                continue;
+        }
+        else
+            break;
+    }
 
     if ((this->resolverSocket = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
         throw std::runtime_error("creating new socket failed :" + std::string(strerror(errno)));

@@ -149,9 +149,9 @@ std::vector<uint8_t> DnsMessage::handover(void)
 void DnsMessage::printName(std::vector<uint8_t> response, uint16_t *offset)
 {
     uint8_t i;
-    while (response[(*offset)] != 0x00) // end of name is 0x00
+    while (response[(*offset)]) // end of name is 0x00
     {
-        if (response[(*offset)] == 0xc0) // Message compression detected
+        if ((response[*offset] & 0xC0) == 0xC0) // Message compression detected
         {
             uint16_t pos = static_cast<uint16_t>(response[(*offset)]) |
                            (static_cast<uint16_t>(response[(*offset) + 1]) << 8); // concatenating 2xuint8_t to uint16_t
@@ -232,11 +232,11 @@ void DnsMessage::printHeader(std::vector<uint8_t> response, uint16_t *offset)
         return;
     }
 
-    std::cout << "Authoritative: " << (header.aa ? "Yes" : "No");
-    std::cout << ",Recursive: " << ((header.ra && header.rd) ? "Yes" : "No");
-    std::cout << ",Truncated: " << (header.tc ? "Yes" : "No");
+    std::cout << "Authoritative: " << (header.aa ? "Yes, " : "No, ");
+    std::cout << "Recursive: " << ((header.ra && header.rd) ? "Yes, " : "No, ");
+    std::cout << "Truncated: " << (header.tc ? "Yes" : "No");
     if (header.rcode)
-        std::cout << "ERROR: " << remapRcode(header.rcode) << std::endl;
+        std::cout << ", ERROR: " << remapRcode(header.rcode);
 }
 
 void DnsMessage::printQuestion(std::vector<uint8_t> response, uint16_t *offset)
