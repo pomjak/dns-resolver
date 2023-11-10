@@ -184,25 +184,32 @@ std::vector<uint8_t> DnsMessage::handover() const
     return buf;
 }
 
-void DnsMessage::printName(std::vector<uint8_t> response, uint16_t *offset)
+/**
+ * @brief prints a DNS domain name from the response buffer.
+ *
+ * @param response vector containing the DNS response.
+ * @param offset pointer to the offset within the response buffer.
+ */
+void DnsMessage::printName(const std::vector<uint8_t> &response, uint16_t *offset)
 {
     uint8_t i;
-    while (response[(*offset)]) // end of name is 0x00
+    while (response[(*offset)])
     {
-        if ((response[*offset] & 0xC0) == 0xC0) // Message compression detected
+        if ((response[*offset] & 0xC0) == 0xC0) // msg compression detected
         {
+            // concatenating 2xuint8_t to uint16_t
             uint16_t pos = static_cast<uint16_t>(response[(*offset)]) |
-                           (static_cast<uint16_t>(response[(*offset) + 1]) << 8); // concatenating 2xuint8_t to uint16_t
+                           (static_cast<uint16_t>(response[(*offset) + 1]) << 8);
 
+            pos = ntohs(pos & 0xFF3F); // getting rid of compress flag
             *offset += 2;
-            pos = ntohs(pos & 0xFF30); // getting rid of compress flag
             printName(response, &pos);
             return;
         }
-
-        else
+        else//print name directly
         {
-            for (i = 1; i <= static_cast<uint8_t>(response[(*offset)]); i++) // number of chars is stored at response[offset]
+            uint8_t labelLength = response[*offset];
+            for (i = 1; i <= labelLength; i++)
                 std::cout << response[(*offset) + i];
             std::cout << '.';
             *offset += i;
