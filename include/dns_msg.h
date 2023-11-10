@@ -49,22 +49,20 @@ struct ResourceRecord
     uint16_t length;
 };
 #pragma pack()
+
 class DnsMessage
 {
-
 private:
-    Header header;
+    Header header{};
     std::vector<uint8_t> qname;
+    Question question{};
+    ResourceRecord answer{};
 
-    Question question;
-
-    ResourceRecord answer;
-
-    void setHeaderId(void);
-    void setRecursion(bool _);
+    void setHeaderId();
+    void setRecursion(bool enable);
     void setClassAndType(bool ipv6, bool inverse);
-    void directAddress(const std::string &_);
-    void reverseAddress(std::string _);
+    void directAddress(const std::string &address);
+    void reverseAddress(std::string address);
     void reverseAddressV6(const std::string &addrV6);
     void printName(const std::vector<uint8_t> &response, uint16_t *offset);
     void printSOA(const std::vector<uint8_t> &response, uint16_t *offset);
@@ -74,18 +72,11 @@ private:
     void printRR(const std::vector<uint8_t> &response, uint16_t *offset, uint16_t cnt);
 
 public:
-    DnsMessage()
-    {
-        memset(&header, 0, sizeof(struct Header));
-        memset(&question, 0, sizeof(struct Question));
-        memset(&answer, 0, sizeof(struct ResourceRecord));
-
-        qname.clear();
-    }
+    DnsMessage() = default;
 
     void constructMsg(param_parser *param);
 
-    std::vector<uint8_t> handover(void) const;
+    std::vector<uint8_t> handover() const;
 
     void printMsg(const std::vector<uint8_t> &response);
 };
