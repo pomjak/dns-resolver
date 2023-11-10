@@ -1,6 +1,10 @@
 #include "dns_msg.h"
 #include "qmaps.h"
 
+/**
+ * @brief generate random id of query
+ *
+ */
 void DnsMessage::setHeaderId(void)
 {
     std::random_device rd;
@@ -12,22 +16,29 @@ void DnsMessage::setHeaderId(void)
     header.id = (unsigned short)htons(distribution(gen));
 }
 
+/**
+ * @brief sets corresponding header recursion flag
+ *
+ */
 void DnsMessage::setRecursion(bool recursion)
 {
     if (recursion)
         header.rd = 1;
 }
 
+/**
+ * @brief Sets the DNS question class and type based on the given parameters.
+ *
+ * @param ipv6 A boolean indicating whether the query is for an IPv6 address.
+ * @param inverse A boolean indicating whether to use the inverse query type (PTR).
+ */
 void DnsMessage::setClassAndType(bool ipv6, bool inverse)
 {
+    question.qClass = htons(1); // INternet class
     if (inverse)
         question.qType = htons(12); // PTR
-    else if (ipv6)
-        question.qType = htons(28); // AAAA
     else
-        question.qType = htons(1); // A
-
-    question.qClass = htons(1); // INternet class
+        question.qType = ipv6 ? htons(28) : htons(1); // AAAA if ipv6, A otherwise
 }
 
 void DnsMessage::directAddress(std::string addr)
