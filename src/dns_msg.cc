@@ -177,6 +177,7 @@ void DnsMessage::printAddress(std::vector<uint8_t> response, uint16_t *offset, u
 {
     uint16_t len = static_cast<uint16_t>(ntohs(answer.length));
     uint16_t i = 0;
+
     if (type == 6)
     {
         for (i = 0; i < len; i += 2)
@@ -189,6 +190,7 @@ void DnsMessage::printAddress(std::vector<uint8_t> response, uint16_t *offset, u
                 std::cout << ":";
         }
     }
+
     if (type == 4)
     {
         for (i = 0; i < len; i++)
@@ -270,7 +272,7 @@ void DnsMessage::printRR(std::vector<uint8_t> response, uint16_t *offset, uint16
 
         std::cout << ", " << remapQType(ntohs(answer.type));
         std::cout << ", " << remapQClass(ntohs(answer.rClass));
-        std::cout << ", " << ntohl(answer.ttl) << ", ";
+        std::cout << ", " << std::dec << static_cast<uint32_t>(ntohl(answer.ttl)) << ", ";
 
         if (remapQType(ntohs(answer.type)) == "A")
             printAddress(response, offset, 4);
