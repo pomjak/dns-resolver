@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <getopt.h>
 
-class param_parser
+class paramParser
 {
 private:
     bool recursion;
@@ -28,7 +28,7 @@ private:
     void setAddress(std::string a) { address = a; }
 
 public:
-    param_parser() : recursion(false), reverse(false), ipv6(false), port(53) {}
+    paramParser() : recursion(false), reverse(false), ipv6(false), port(53) {}
 
     void processParams(int argc, char **argv);
 

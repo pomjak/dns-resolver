@@ -7,7 +7,7 @@
 #include <cerrno>
 #include <vector>
 
-#include "param_parser.h"
+#include "paramParser.h"
 
 class communicate
 {
@@ -29,7 +29,7 @@ public:
         }
     }
 
-    void start(param_parser *param);
+    void start(paramParser *param);
     void sendQuery(std::vector<uint8_t> msg);
     std::vector<uint8_t> recvResponse(void);
     void end(void);

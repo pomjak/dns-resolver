@@ -1,4 +1,4 @@
-#include "param_parser.h"
+#include "paramParser.h"
 
 enum class Option
 {
@@ -9,7 +9,7 @@ enum class Option
     Port = 'p',
 };
 
-void param_parser::processParams(int argc, char **argv)
+void paramParser::processParams(int argc, char **argv)
 {
     int opt;
 

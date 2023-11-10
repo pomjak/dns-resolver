@@ -12,9 +12,9 @@
 - fix server flag is required
 - fix err exceptions
 - edit default port to 53
-- implementing start,send,recv,end in socket_handler
+- implementing start,send,recv,end in socketHandler
 - edit flags to struct
-- add socket_handler module
+- add socketHandler module
 - add exception handling
 - added socket handling
 - added test

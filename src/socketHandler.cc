@@ -1,10 +1,10 @@
-#include "socket_handler.h"
-#include "param_parser.h"
-#include "dns_msg.h"
+#include "socketHandler.h"
+#include "paramParser.h"
+#include "DnsMsg.h"
 
 #define UDP_LIMIT 512
 
-void communicate::start(param_parser *param)
+void communicate::start(paramParser *param)
 {
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(param->getPort());

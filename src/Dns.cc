@@ -1,12 +1,12 @@
 #include <iostream>
 #include <exception>
-#include "param_parser.h"
-#include "socket_handler.h"
-#include "dns_msg.h"
+#include "paramParser.h"
+#include "socketHandler.h"
+#include "DnsMsg.h"
 
 int main(int argc, char **argv)
 {
-    param_parser param;
+    paramParser param;
     communicate socket;
     DnsMessage msg;
 

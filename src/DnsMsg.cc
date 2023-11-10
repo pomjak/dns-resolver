@@ -1,5 +1,5 @@
-#include "dns_msg.h"
-#include "qmaps.h"
+#include "DnsMsg.h"
+#include "Maps.h"
 
 /**
  * @brief generate random id of query
@@ -139,9 +139,9 @@ void DnsMessage::reverseAddressV6(const std::string &addrV6)
 /**
  * @brief constructs a DNS message based on the provided parameters.
  *
- * @param param param_parser object containing parameters for constructing the DNS message.
+ * @param param paramParser object containing parameters for constructing the DNS message.
  */
-void DnsMessage::constructMsg(param_parser *param)
+void DnsMessage::constructMsg(paramParser *param)
 {
     setHeaderId();
 

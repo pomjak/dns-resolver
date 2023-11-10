@@ -5,7 +5,7 @@
 #include <arpa/inet.h>
 #include <sstream>
 #include <iomanip>
-#include "param_parser.h"
+#include "paramParser.h"
 
 // HEADER
 //  0-15b    ID      [SET]   RAND
@@ -74,7 +74,7 @@ private:
 public:
     DnsMessage() = default;
 
-    void constructMsg(param_parser *param);
+    void constructMsg(paramParser *param);
 
     std::vector<uint8_t> handover() const;
 
