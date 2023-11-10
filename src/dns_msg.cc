@@ -219,11 +219,11 @@ void DnsMessage::printName(const std::vector<uint8_t> &response, uint16_t *offse
 }
 
 /**
- * @brief Prints an IPv4 or IPv6 address from the response buffer.
+ * @brief prints an IPv4 or IPv6 address from the response buffer.
  *
- * @param response The vector containing the DNS response.
- * @param offset A pointer to the offset within the response buffer.
- * @param type The type of the address (4 for IPv4, 6 for IPv6).
+ * @param response  vector containing the DNS response.
+ * @param offset pointer to the offset within the response buffer.
+ * @param type type of the address (4 for IPv4, 6 for IPv6(pretty self-explanatory)).
  */
 void DnsMessage::printAddress(const std::vector<uint8_t> &response, uint16_t *offset, uint8_t type)
 {
@@ -252,20 +252,22 @@ void DnsMessage::printAddress(const std::vector<uint8_t> &response, uint16_t *of
     *offset += i;
 }
 
-void DnsMessage::printSOA(std::vector<uint8_t> response, uint16_t *offset)
+/**
+ * @brief Prints information related to a DNS SOA (Start of Authority) record from the response buffer.
+ *
+ * @param response The vector containing the DNS response.
+ * @param offset A pointer to the offset within the response buffer.
+ */
+void DnsMessage::printSOA(const std::vector<uint8_t> &response, uint16_t *offset)
 {
     printName(response, offset);
     std::cout << ", ";
     printName(response, offset);
 
-    uint32_t soaData;
-
     for (int i = 0; i < 5; i++)
     {
-        std::cout << ", ";
-        memcpy(&soaData, response.data() + (*offset), sizeof(soaData));
-        (*offset) += sizeof(soaData);
-        std::cout << ntohl(soaData);
+        std::cout << ", " << ntohl(*reinterpret_cast<const uint32_t *>(&response[(*offset)]));
+        (*offset) += sizeof(uint32_t);
     }
 }
 

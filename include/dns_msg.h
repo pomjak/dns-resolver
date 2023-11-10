@@ -67,7 +67,7 @@ private:
     void reverseAddress(std::string _);
     void reverseAddressV6(const std::string &addrV6);
     void printName(const std::vector<uint8_t> &response, uint16_t *offset);
-    void printSOA(std::vector<uint8_t> response, uint16_t *offset);
+    void printSOA(const std::vector<uint8_t> &response, uint16_t *offset);
     void printAddress(const std::vector<uint8_t> &response, uint16_t *offset, uint8_t type);
     void printHeader(std::vector<uint8_t> response, uint16_t *offset);
     void printQuestion(std::vector<uint8_t> response, uint16_t *offset);
