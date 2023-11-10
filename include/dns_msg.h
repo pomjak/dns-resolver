@@ -85,7 +85,7 @@ public:
 
     void constructMsg(param_parser *param);
 
-    std::vector<uint8_t> handover(void);
+    std::vector<uint8_t> handover(void) const;
 
     void printMsg(std::vector<uint8_t> response);
 };

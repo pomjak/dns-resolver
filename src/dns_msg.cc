@@ -117,8 +117,8 @@ void DnsMessage::reverseAddressV6(const std::string &addrV6)
     {
         if (addrV6[i] != ':')
         {
-            qname.push_back(static_cast<uint8_t>(1));           // length is always 1
-            qname.push_back(static_cast<uint8_t>(addrV6[i]));   // storing addr per byte    
+            qname.push_back(static_cast<uint8_t>(1));         // length is always 1
+            qname.push_back(static_cast<uint8_t>(addrV6[i])); // storing addr per byte
         }
     }
     // append 'ip6.arpa' suffix
@@ -163,19 +163,23 @@ void DnsMessage::constructMsg(param_parser *param)
     header.qCount = htons(1);
 }
 
-std::vector<uint8_t> DnsMessage::handover(void)
+/**
+ * @brief prepares and returns a vector containing the DNS message for transmission.
+ *
+ * @return std::vector<uint8_t> vector containing the DNS message.
+ */
+std::vector<uint8_t> DnsMessage::handover() const
 {
-    std::vector<uint8_t> buf;
-    buf.resize(sizeof(Header));
+    std::vector<uint8_t> buf(sizeof(Header) + qname.size() + sizeof(Question));
+
+    // copy the header into the buffer
     memcpy(buf.data(), &header, sizeof(Header));
 
-    buf.insert(buf.end(), qname.begin(), qname.end());
+    // append the qname to the buffer
+    memcpy(buf.data() + sizeof(Header), qname.data(), qname.size());
 
-    std::vector<uint8_t> buf_q;
-    buf_q.resize(sizeof(Question));
-    memcpy(buf_q.data(), &question, sizeof(Question));
-
-    buf.insert(buf.end(), buf_q.begin(), buf_q.end());
+    // copy the question into the buffer
+    memcpy(buf.data() + sizeof(Header) + qname.size(), &question, sizeof(Question));
 
     return buf;
 }
