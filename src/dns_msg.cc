@@ -172,6 +172,7 @@ void DnsMessage::printName(std::vector<uint8_t> response, uint16_t *offset)
     }
     (*offset)++;
 }
+
 void DnsMessage::printAddress(std::vector<uint8_t> response, uint16_t *offset, uint8_t type)
 {
     uint16_t len = static_cast<uint16_t>(ntohs(answer.length));
@@ -226,18 +227,21 @@ void DnsMessage::printHeader(std::vector<uint8_t> response, uint16_t *offset)
 
     (*offset) += sizeof(Header);
     if (id != header.id)
+    {
         std::cout << "Header ID does not match" << std::endl;
+        return;
+    }
 
-    std::cout << "Authoritative: " << (header.aa ? "yes" : "no") << std::endl;
-    std::cout << "Recursive: " << ((header.ra && header.rd) ? "yes" : "no") << std::endl;
-    std::cout << "Truncated: " << (header.tc ? "yes" : "no") << std::endl;
+    std::cout << "Authoritative: " << (header.aa ? "Yes" : "No");
+    std::cout << ",Recursive: " << ((header.ra && header.rd) ? "Yes" : "No");
+    std::cout << ",Truncated: " << (header.tc ? "Yes" : "No");
     if (header.rcode)
         std::cout << "ERROR: " << remapRcode(header.rcode) << std::endl;
 }
 
 void DnsMessage::printQuestion(std::vector<uint8_t> response, uint16_t *offset)
 {
-    std::cout << "Question(" << ntohs(header.qCount) << ")" << std::endl;
+    std::cout << "Question section (" << ntohs(header.qCount) << ")" << std::endl;
     for (uint8_t i = 0; i < ntohs(header.qCount); i++)
     {
         std::cout << "  ";
@@ -295,13 +299,13 @@ void DnsMessage::printMsg(std::vector<uint8_t> response)
 
     printQuestion(response, &offset);
     std::cout
-        << "Answer(" << ntohs(header.ansCount) << ")" << std::endl;
+        << "Answer section (" << ntohs(header.ansCount) << ")" << std::endl;
     printRR(response, &offset, header.ansCount);
 
     std::cout
-        << "Authority(" << ntohs(header.authCount) << ")" << std::endl;
+        << "Authority section(" << ntohs(header.authCount) << ")" << std::endl;
     printRR(response, &offset, header.authCount);
     std::cout
-        << "Additional(" << ntohs(header.addCount) << ")" << std::endl;
+        << "Additional section(" << ntohs(header.addCount) << ")" << std::endl;
     printRR(response, &offset, header.addCount);
 }

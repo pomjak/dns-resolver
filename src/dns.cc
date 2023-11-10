@@ -14,7 +14,7 @@ int main(int argc, char **argv)
     {
         param.processParams(argc, argv);
 
-        sckt.start(&param); 
+        sckt.start(&param);
 
         msg.constructMsg(&param);
 
@@ -28,13 +28,13 @@ int main(int argc, char **argv)
     catch (const std::invalid_argument &e)
     {
         std::cerr << "Invalid Argument Exception: " << e.what() << std::endl;
-        return EXIT_FAILURE;
+        exit(EXIT_FAILURE);
     }
 
     catch (const std::exception &e)
     {
         std::cerr << "Generic Exception: " << e.what() << std::endl;
-        return EXIT_FAILURE;
+        exit(EXIT_FAILURE);
     }
 
     return EXIT_SUCCESS;

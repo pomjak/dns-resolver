@@ -5,35 +5,35 @@ GREEN = '\033[0;32m'
 YELLOW = '\033[0;33m'
 RESET = '\033[0m'
 
-def run_command(*command):
-        popen = subprocess.Popen(command, stdout=subprocess.PIPE)
-        popen.wait()
-        return popen.stdout.read()
+def run_command(command):
+        output = subprocess.run(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        return output
 
 
 def main():
-    with open('domains', 'r') as domain_file: 
-        for domain in domain_file:
+    # with open('domains', 'r') as domain_file: 
+    #     for domain in domain_file:\
+            domain = "www.youtube.com"
             domain = domain.strip()
 
-            dig_output = run_command("dig", "@147.229.8.12", "+noall", "+answer", "{domain}")
-            prog_output = run_command("test", "-s", "147.229.8.12", "{domain}")
-            print(prog_output)
+            dig_output = run_command("dig @147.229.8.12 +noall +answer ".join(domain) )
+            prog_output = run_command("./test -s 147.229.8.12 ".join(domain))
+            print(prog_output.stdout)
             print(dig_output)
 
-            no_dig = len(dig_output.splitlines())
+            no_dig = len(dig_output.splitlines())+1
 
 
-            for i in range(1, no_dig + 1):
+            for i in range(0, no_dig):
 
-                dig_line = dig_output.splitlines()[i - 1]
+                dig_line = dig_output.splitlines()[i]
                 dig_name, dig_ttl, dig_class, dig_type, dig_data = dig_line.split()
                 dig_name = dig_name.strip()
                 dig_class = dig_class.strip()
                 dig_type = dig_type.strip()
                 dig_data = dig_data.strip()
 
-                dns_line = parsed_dns.splitlines()[i - 1].replace(" ", "")
+                dns_line = parsed_dns.splitlines()[i].replace(" ", "")
                 dns_name, dns_type, dns_class, dns_ttl, dns_data = dns_line.split(',')
                 dns_name = dns_name.strip()
                 dns_type = dns_type.strip()
