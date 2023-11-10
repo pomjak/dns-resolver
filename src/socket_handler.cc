@@ -11,8 +11,8 @@ void communicate::start(param_parser *param)
 
     host_info = gethostbyname(param->getServer().c_str());
 
-    if (host_info == NULL)
-        throw std::runtime_error("server ip not found : ");
+    if (host_info == NULL || host_info->h_addr_list[0] == NULL)
+        throw std::runtime_error("No IP address found for the server");
 
     for (int i = 0; host_info->h_addr_list[i]; i++)
     {
@@ -20,8 +20,8 @@ void communicate::start(param_parser *param)
 
         if (inet_pton(AF_INET, inet_ntoa(addr), &serverAddr.sin_addr) <= 0)
         {
-            if (host_info->h_addr_list[i + 1] == NULL)
-                throw std::runtime_error("converting to network format failed : ");
+            if (host_info->h_addr_list[i + 1] == nullptr)
+                throw std::runtime_error("Converting IP address to network format failed");
             else
                 continue;
         }
@@ -30,7 +30,7 @@ void communicate::start(param_parser *param)
     }
 
     if ((this->resolverSocket = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
-        throw std::runtime_error("creating new socket failed :" + std::string(strerror(errno)));
+        throw std::runtime_error("Creating new socket failed: " + std::string(strerror(errno)));
 
     len = sizeof(serverAddr);
     fromlen = sizeof(from);
@@ -39,31 +39,35 @@ void communicate::start(param_parser *param)
 void communicate::sendQuery(std::vector<uint8_t> msg)
 {
     if (connect(resolverSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) == -1)
-        throw std::runtime_error("connect failed :" + std::string(strerror(errno)));
+        throw std::runtime_error("Connect failed: " + std::string(strerror(errno)));
 
-    int bytesTx = send(this->resolverSocket, msg.data(), msg.size(), MSG_CONFIRM);
+    auto bytesTx = send(this->resolverSocket, msg.data(), msg.size(), MSG_CONFIRM);
     if (bytesTx < 0)
-        throw std::runtime_error("sending msg failed :" + std::string(strerror(errno)));
+        throw std::runtime_error("Sending message failed: " + std::string(strerror(errno)));
 
     if (getsockname(resolverSocket, (struct sockaddr *)&from, &len) == -1)
-        throw std::runtime_error("getsockname() failed :" + std::string(strerror(errno)));
+        throw std::runtime_error("getsockname() failed: " + std::string(strerror(errno)));
 }
 
 std::vector<uint8_t> communicate::recvResponse(void)
 {
     char response[UDP_LIMIT];
-    size_t bytesRead;
+    auto bytesRead = recv(resolverSocket, response, UDP_LIMIT, MSG_WAITALL);
 
-    while ((bytesRead = recv(resolverSocket, response, UDP_LIMIT, MSG_WAITALL)) > 0)
+    if (bytesRead > 0)
     {
         getpeername(resolverSocket, (struct sockaddr *)&from, &fromlen);
-        std::vector<uint8_t> receivedData(response, response + bytesRead);
-        return receivedData;
+        return std::vector<uint8_t>(response, response + bytesRead);
     }
-    throw std::runtime_error("recv() failed" + std::string(strerror(errno)));
+
+    throw std::runtime_error("recv() failed: " + std::string(strerror(errno)));
 }
 
 void communicate::end(void)
 {
-    close(resolverSocket);
+    if (resolverSocket != -1)
+    {
+        close(resolverSocket);
+        resolverSocket = -1; // Mark socket as closed
+    }
 }

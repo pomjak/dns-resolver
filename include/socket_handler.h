@@ -19,14 +19,16 @@ private:
     struct in_addr addr;
 
 public:
-    communicate()
-    {
-        this->resolverSocket = -1;
-    }
+    communicate() : resolverSocket(-1), len(sizeof(from)), fromlen(sizeof(from)) {}
+
     ~communicate()
     {
-        close(resolverSocket);
+        if (resolverSocket != -1)
+        {
+            close(resolverSocket);
+        }
     }
+
     void start(param_parser *param);
     void sendQuery(std::vector<uint8_t> msg);
     std::vector<uint8_t> recvResponse(void);
