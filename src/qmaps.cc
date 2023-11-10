@@ -34,30 +34,36 @@ std::map<uint16_t, std::string> qtypeMap =
 
 std::string remapQClass(uint16_t qclass)
 {
-    auto it = qclassMap.find(qclass);
-    if (it != qclassMap.end())
-        return it->second;
-
-    else
+    try
+    {
+        return qclassMap.at(qclass);
+    }
+    catch (const std::out_of_range &)
+    {
         return "Unknown";
+    }
 }
 
-std::string remapQType(uint16_t qclass)
+std::string remapQType(uint16_t qtype)
 {
-    auto it = qtypeMap.find(qclass);
-    if (it != qtypeMap.end())
-        return it->second;
-
-    else
+    try
+    {
+        return qtypeMap.at(qtype);
+    }
+    catch (const std::out_of_range &)
+    {
         return "Unknown";
+    }
 }
 
 std::string remapRcode(uint16_t rcode)
 {
-    auto it = rcodeMap.find(rcode);
-    if (it != rcodeMap.end())
-        return it->second;
-
-    else
+    try
+    {
+        return rcodeMap.at(rcode);
+    }
+    catch (const std::out_of_range &)
+    {
         return "Unknown";
+    }
 }
