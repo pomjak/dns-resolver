@@ -1,5 +1,14 @@
 #include "param_parser.h"
 
+enum class Option
+{
+    Recursion = 'r',
+    Reverse = 'x',
+    IPv6 = '6',
+    Server = 's',
+    Port = 'p',
+};
+
 void param_parser::processParams(int argc, char **argv)
 {
     int opt;
@@ -12,39 +21,39 @@ void param_parser::processParams(int argc, char **argv)
 
     while ((opt = getopt(argc, argv, "rx6s:p:")) != -1)
     {
-        switch (opt)
+        switch (static_cast<Option>(opt))
         {
-        case 'r':
-            this->setRecursion(true);
+        case Option::Recursion:
+            setRecursion(true);
             break;
 
-        case 'x':
-            this->setReverse(true);
+        case Option::Reverse:
+            setReverse(true);
             break;
 
-        case '6':
-            this->setIPv6(true);
+        case Option::IPv6:
+            setIPv6(true);
             break;
 
-        case 's':
-            this->setServer(optarg);
+        case Option::Server:
+            setServer(optarg);
             break;
 
-        case 'p':
-            this->setPort(std::stoi(optarg));
+        case Option::Port:
+            setPort(std::stoi(optarg));
             break;
 
         default:
+            std::cerr << "Unknown option: " << static_cast<char>(opt) << std::endl;
             std::cerr << "USAGE: dns [-r] [-x] [-6] -s server [-p port] address" << std::endl;
-            break;
         }
     }
 
     if (optind < argc)
-        this->setAddress(argv[optind]);
+        setAddress(argv[optind]);
     else
         throw std::invalid_argument("Address must be set");
 
-    if (getServer() == "")
+    if (getServer().empty())
         throw std::invalid_argument("Server address must be set");
 }
