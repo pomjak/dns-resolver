@@ -69,7 +69,7 @@ private:
     void printName(const std::vector<uint8_t> &response, uint16_t *offset);
     void printSOA(const std::vector<uint8_t> &response, uint16_t *offset);
     void printAddress(const std::vector<uint8_t> &response, uint16_t *offset, uint8_t type);
-    void printHeader(std::vector<uint8_t> response, uint16_t *offset);
+    void printHeader(const std::vector<uint8_t> &response, uint16_t *offset);
     void printQuestion(std::vector<uint8_t> response, uint16_t *offset);
     void printRR(std::vector<uint8_t> response, uint16_t *offset, uint16_t cnt);
 

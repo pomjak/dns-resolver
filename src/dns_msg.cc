@@ -253,10 +253,10 @@ void DnsMessage::printAddress(const std::vector<uint8_t> &response, uint16_t *of
 }
 
 /**
- * @brief Prints information related to a DNS SOA (Start of Authority) record from the response buffer.
+ * @brief prints information related to a DNS SOA (Start of Authority) record from the response buffer.
  *
- * @param response The vector containing the DNS response.
- * @param offset A pointer to the offset within the response buffer.
+ * @param response  vector containing the DNS response.
+ * @param offset  pointer to the offset within the response buffer.
  */
 void DnsMessage::printSOA(const std::vector<uint8_t> &response, uint16_t *offset)
 {
@@ -271,14 +271,24 @@ void DnsMessage::printSOA(const std::vector<uint8_t> &response, uint16_t *offset
     }
 }
 
-void DnsMessage::printHeader(std::vector<uint8_t> response, uint16_t *offset)
+/**
+ * @brief prints information related to the DNS message header from the response buffer.
+ *
+ * @param response  vector containing the DNS response.
+ * @param offset pointer to the offset within the response buffer.
+ */
+void DnsMessage::printHeader(const std::vector<uint8_t> &response, uint16_t *offset)
 {
-    uint16_t id = header.id;
+    uint16_t originalId = header.id;
+
+    // reset header and copy from response
     memset(&header, 0, sizeof(Header));
     memcpy(&header, response.data(), sizeof(Header));
 
     (*offset) += sizeof(Header);
-    if (id != header.id)
+
+    // check if the ID matches
+    if (originalId != header.id)
     {
         std::cout << "Header ID does not match" << std::endl;
         return;
@@ -287,6 +297,8 @@ void DnsMessage::printHeader(std::vector<uint8_t> response, uint16_t *offset)
     std::cout << "Authoritative: " << (header.aa ? "Yes, " : "No, ");
     std::cout << "Recursive: " << ((header.ra && header.rd) ? "Yes, " : "No, ");
     std::cout << "Truncated: " << (header.tc ? "Yes" : "No");
+
+    // print ERROR and remapped rcode if rcode is received, but still continue in printing output
     if (header.rcode)
         std::cout << ", ERROR: " << remapRcode(header.rcode);
 }
