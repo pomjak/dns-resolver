@@ -218,31 +218,34 @@ void DnsMessage::printName(const std::vector<uint8_t> &response, uint16_t *offse
     (*offset)++;
 }
 
-void DnsMessage::printAddress(std::vector<uint8_t> response, uint16_t *offset, uint8_t type)
+/**
+ * @brief Prints an IPv4 or IPv6 address from the response buffer.
+ *
+ * @param response The vector containing the DNS response.
+ * @param offset A pointer to the offset within the response buffer.
+ * @param type The type of the address (4 for IPv4, 6 for IPv6).
+ */
+void DnsMessage::printAddress(const std::vector<uint8_t> &response, uint16_t *offset, uint8_t type)
 {
-    uint16_t len = static_cast<uint16_t>(ntohs(answer.length));
+    uint16_t len = ntohs(answer.length);
     uint16_t i = 0;
 
-    if (type == 6)
+    for (i = 0; i < len;)
     {
-        for (i = 0; i < len; i += 2)
+        if (type == 6)
         {
-            std::cout << std::hex << std::setw(2) << std::setfill('0')
-                      << static_cast<int>(response[(*offset) + i]);
-            std::cout << std::hex << std::setw(2) << std::setfill('0')
-                      << static_cast<int>(response[(*offset) + i + 1]);
+            std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(response[(*offset) + i]);
+            std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(response[(*offset) + i + 1]);
             if (i != (len - 2))
                 std::cout << ":";
+            i += 2;
         }
-    }
-
-    if (type == 4)
-    {
-        for (i = 0; i < len; i++)
+        else if (type == 4)
         {
             std::cout << static_cast<int>(response[(*offset) + i]);
             if (i != (len - 1))
                 std::cout << ".";
+            i += 1;
         }
     }
 
