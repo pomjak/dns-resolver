@@ -33,6 +33,7 @@
 
 # Vscode folders
 .vscode/
+build/
 test-build/
 test-artifacts/
 dns

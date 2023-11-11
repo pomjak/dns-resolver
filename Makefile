@@ -24,6 +24,18 @@ debug:$(SRC)
 clean:
 	$(RM) $(OBJS) test-build test-artifacts
 	$(RM) vgcore.*
+
+build:clean
+	mkdir 			build/
+	cp -r src/* 	build/
+	cp -r include/* build/
+	cp -r test/* 	build/
+	cp Makefile  	build/
+	cd build && \
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(CFLAGS) *.cc -o dns 
+	cd ..
+	cp build/dns dns
+	
 test:clean
 	mkdir 			test-build/
 	mkdir 			test-artifacts/
