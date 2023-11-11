@@ -1,6 +1,7 @@
 import subprocess
 import ipaddress
 import traceback
+import os
 
 RED = '\033[0;31m'
 GREEN = '\033[0;32m'
@@ -11,18 +12,35 @@ commands = [
     {'desc':'A record',             'file':'domains',   'dig':'dig @8.8.8.8 +noall +answer A ',          'dns':'./test -r -s 8.8.8.8 '       },
     {'desc':'AAAA record',          'file':'domains',   'dig':'dig @8.8.8.8 +noall +answer AAAA ',       'dns':'./test -r -s 8.8.8.8 -6 '    },
     {'desc':'reverse A record',     'file':'ips',       'dig':'dig @8.8.8.8 +noall +answer -x ',       'dns':'./test -r -s 8.8.8.8 -x '    },
-    {'desc':'reverse AAAA record',  'file':'ips6',      'dig':'dig @8.8.8.8 +noall +answer -x AAAA ',    'dns':'./test -r -s 8.8.8.8 -x -6 ' },
+    {'desc':'reverse AAAA record',  'file':'ips6',      'dig':'dig @8.8.8.8 +noall +answer -x ',    'dns':'./test -r -s 8.8.8.8 -x -6 ' },
     ]
 
 def print_dict(listDict):
     for oneDict in listDict:
         print(oneDict)
         
-def create_artifact(domain,dig,dns,test_case):
-    subprocess.run(['mkdir','-p' ,'../test-artifacts/'], check=True)
-    subprocess.run(['mkdir','-p','../test-artifacts/' + test_case['desc'].strip()], check=True)
-    subprocess.run(['touch','../test-artifacts/' + test_case['desc'].strip()+"/"+ domain], check=True)
-    data_buffer = f""                        
+def create_artifact(status,domain,dig,dns,test_case):
+    file_path = f"../test-artifacts/{test_case['desc']}/{domain}"
+    folder_path = f"../test-artifacts/{test_case['desc']}"
+    
+    os.makedirs(folder_path, exist_ok=True)
+    
+    with open(file_path, 'w') as file:
+        if status == "PASS":
+            file.write(f"TEST {test_case['desc']} for {domain} PASSED")
+        else:
+            file.write(f"TEST {test_case['desc']} for {domain} FAILED {status} not matching")
+            
+        file.write("\nDIG output:")
+        for oneDig in dig:
+            file.write(f"{oneDig}")
+            
+        file.write("\nDNS output:")    
+        for oneDns in dig:
+            file.write(f"{oneDns}")
+            
+        file.close()
+                             
 
 def run_command(cmd):   
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -114,25 +132,29 @@ def main():
                     if dig_record['name'] != dns_record['name']:
                         print(f"Test {RED}FAILED{RESET} [name of {domain}]")
                         print(f"Expected \"{dig_record['name']}\", got \"{dns_record['name']}\"")
+                        create_artifact("NAME",domain,dig,dns,test_case)
                         exit(1)
 
                     elif dig_record['class'] != dns_record['class']:
                         print(f"Test {RED}FAILED{RESET} [class of {domain}]")
                         print(f"Expected \"{dig_record['class']}\", got \"{dns_record['class']}\"")
+                        create_artifact("CLASS",domain,dig,dns,test_case)
                         exit(1)
 
                     elif dig_record['type'] != dns_record['type']:
                         print(f"Test {RED}FAILED{RESET} [type of {domain}]")
                         print(f"Expected \"{dig_record['type']}\", got \"{dns_record['type']}\"")
+                        create_artifact("TYPE",domain,dig,dns,test_case)
                         exit(1)
 
                     elif dig_record['data'] != dns_record['data']:
                         print(f"Test {RED}FAILED{RESET} [addr of {domain}]")
                         print(f"Expected \"{dig_record['data']}\", got \"{dns_record['data']}\"")
+                        create_artifact("DATA",domain,dig,dns,test_case)
                         exit(1)
 
                     else:
-                        create_artifact(domain,dig,dns,test_case)
+                        create_artifact("PASS",domain,dig,dns,test_case)
                         print(f"Test {GREEN}OK{RESET} [ {domain} ]")
 
 if __name__ == "__main__":
