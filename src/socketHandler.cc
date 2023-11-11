@@ -9,12 +9,12 @@ void communicate::start(paramParser *param)
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(param->getPort());
 
-    host_info = gethostbyname(param->getServer().c_str());
+    host_info = gethostbyname(param->getServer().c_str());//gets corresponding ip to address
 
-    if (host_info == NULL || host_info->h_addr_list[0] == NULL)
+    if (host_info == NULL || host_info->h_addr_list[0] == NULL)//in case of failure
         throw std::runtime_error("No IP address found for the server");
 
-    for (int i = 0; host_info->h_addr_list[i]; i++)
+    for (int i = 0; host_info->h_addr_list[i]; i++)//iterate over ip's to get 1st responsive
     {
         memcpy(&addr, host_info->h_addr_list[i], sizeof(struct in_addr));
 
