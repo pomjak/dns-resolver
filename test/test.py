@@ -6,10 +6,10 @@ YELLOW = '\033[0;33m'
 RESET = '\033[0m'
 
 commands = [
-    {'desc':'A record',             'file':'domains',   'dig':'dig -r @8.8.8.8 +noall +answer A ',          'dns':'./test -r -s 8.8.8.8 '       },
-    {'desc':'AAAA record',          'file':'domains',   'dig':'dig -r @8.8.8.8 +noall +answer AAAA ',       'dns':'./test -r -s 8.8.8.8 -6 '    },
-    {'desc':'reverse A record',     'file':'ips',       'dig':'dig -r @8.8.8.8 +noall +answer -x A ',       'dns':'./test -r -s 8.8.8.8 -x '    },
-    {'desc':'reverse AAAA record',  'file':'ips6',      'dig':'dig -r @8.8.8.8 +noall +answer -x AAAA ',    'dns':'./test -r -s 8.8.8.8 -x -6 ' },
+    {'desc':'A record',             'file':'domains',   'dig':'dig @8.8.8.8 +noall +answer A ',          'dns':'./test -r -s 8.8.8.8 '       },
+    {'desc':'AAAA record',          'file':'domains',   'dig':'dig @8.8.8.8 +noall +answer AAAA ',       'dns':'./test -r -s 8.8.8.8 -6 '    },
+    {'desc':'reverse A record',     'file':'ips',       'dig':'dig @8.8.8.8 +noall +answer -x A ',       'dns':'./test -r -s 8.8.8.8 -x '    },
+    {'desc':'reverse AAAA record',  'file':'ips6',      'dig':'dig @8.8.8.8 +noall +answer -x AAAA ',    'dns':'./test -r -s 8.8.8.8 -x -6 ' },
     ]
 
 def run_command(cmd):   
