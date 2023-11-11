@@ -22,11 +22,11 @@ debug:$(SRC)
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(CFLAGS) $(DEBUG)-o $(OBJS) $(SRC)
 
 clean:
-	$(RM) $(OBJS) test-build
+	$(RM) $(OBJS) test-build test-artifacts
 	$(RM) vgcore.*
-test:
-	rm -rf       	test-build/
+test:clean
 	mkdir 			test-build/
+	mkdir 			test-artifacts/
 	cp -r src/* 	test-build/
 	cp -r include/* test-build/
 	cp -r test/* 	test-build/

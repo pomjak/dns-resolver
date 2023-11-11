@@ -1,4 +1,6 @@
 import subprocess
+import ipaddress
+import traceback
 
 RED = '\033[0;31m'
 GREEN = '\033[0;32m'
@@ -8,9 +10,18 @@ RESET = '\033[0m'
 commands = [
     {'desc':'A record',             'file':'domains',   'dig':'dig @8.8.8.8 +noall +answer A ',          'dns':'./test -r -s 8.8.8.8 '       },
     {'desc':'AAAA record',          'file':'domains',   'dig':'dig @8.8.8.8 +noall +answer AAAA ',       'dns':'./test -r -s 8.8.8.8 -6 '    },
-    {'desc':'reverse A record',     'file':'ips',       'dig':'dig @8.8.8.8 +noall +answer -x A ',       'dns':'./test -r -s 8.8.8.8 -x '    },
+    {'desc':'reverse A record',     'file':'ips',       'dig':'dig @8.8.8.8 +noall +answer -x ',       'dns':'./test -r -s 8.8.8.8 -x '    },
     {'desc':'reverse AAAA record',  'file':'ips6',      'dig':'dig @8.8.8.8 +noall +answer -x AAAA ',    'dns':'./test -r -s 8.8.8.8 -x -6 ' },
     ]
+
+def print_dict(listDict):
+    for oneDict in listDict:
+        print(oneDict)
+        
+def create_artifact(dig,dns,test_case):
+    subprocess.run(['mkdir','-p' ,'../test-artifacts/'], check=True)
+    subprocess.run(['touch','../test-artifacts/' + test_case['desc'].strip()], check=True)
+                        
 
 def run_command(cmd):   
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -35,13 +46,13 @@ def cut_out_answer(data):
     return '\n'.join(result_lines[:-1])
 
 def main():
+    
     for test_case in commands:
+        
         with open(test_case['file'], 'r') as domain_file: 
-            
             print("__________ " + test_case['desc'] + " Test__________")
             
             for domain in domain_file:
-                
                 domain = domain.strip()
 
                 dig_output, dig_stderr = run_command(test_case['dig'] + domain)
@@ -55,31 +66,42 @@ def main():
 
                 for dig_line,dns_line in zip(dig_output.split('\n'),dns_output.split('\n')):
                     try:
-                        name, ttl, rclass, rtype, data = dig_line.split()
-                        name = name.strip()
-                        rclass = rclass.strip()
-                        rtype = rtype.strip()
-                        data = data.strip()
+                        if dig_line == "":
+                            new_record = {'name': "", 'class': "", 'type' : "", 'ttl' : "",'data' : ""}
+                            dig.append(new_record)
+                        else:
+                            name, ttl, rclass, rtype, data = dig_line.split()
+                            name = name.strip()
+                            rclass = rclass.strip()
+                            rtype = rtype.strip()
+                            data = data.strip()
+                            if "AAAA record" == test_case['desc'] and rtype == 'AAAA': #exploding ip6 from dig
+                                data = ipaddress.ip_address(data).exploded
 
-                        new_record = {'name': name, 'class': rclass, 'type' : rtype, 'ttl' : ttl,'data' : data}
-                        dig.append(new_record)
-                    except ValueError:
-                        print(f"Error parsing dig line: {dig_line} with {domain}")
-                        exit(1)
+                            new_record = {'name': name, 'class': rclass, 'type' : rtype, 'ttl' : ttl,'data' : data}
+                            dig.append(new_record)
+                        
+                    except ValueError as e:
+                        print(f"Error parsing DIG line: {dig_line} with {domain}")
+                        print (f"{e}")
                         
                     try:
-                        name, rtype, rclass, ttl, data = dns_line.split(",")
-                        name = name.strip()
-                        rtype = rtype.strip()
-                        rclass = rclass.strip()
-                        ttl = ttl.strip()
-                        data = data.strip()
+                        if dns_line == "":
+                            new_record = {'name': "", 'class': "", 'type' : "", 'ttl' : "",'data' : ""}
+                            dns.append(new_record)
+                        else:
+                            name, rtype, rclass, ttl, data = dns_line.split(",")
+                            name = name.strip()
+                            rtype = rtype.strip()
+                            rclass = rclass.strip()
+                            ttl = ttl.strip()
+                            data = data.strip()
 
-                        new_record = {'name': name, 'class': rclass, 'type' : rtype, 'ttl' : ttl,'data' : data}
-                        dns.append(new_record)
-                    except ValueError:
-                        print(f"Error parsing dns line: {dns_line} with {domain}")
-                        exit(1)
+                            new_record = {'name': name, 'class': rclass, 'type' : rtype, 'ttl' : ttl,'data' : data}
+                            dns.append(new_record)
+                    except ValueError as e:
+                        print(f"Error parsing DNS line: {dns_line} with {domain}")
+                        print (f"{e}")
                     
                 dig.sort(key=lambda x: x['data'])
                 dns.sort(key=lambda x: x['data'])
@@ -107,6 +129,7 @@ def main():
                         exit(1)
 
                     else:
+                        create_artifact(dig,dns,test_case)
                         print(f"Test {GREEN}OK{RESET} [ {domain} ]")
 
 if __name__ == "__main__":

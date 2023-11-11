@@ -34,5 +34,6 @@
 # Vscode folders
 .vscode/
 test-build/
+test-artifacts/
 dns
 vgcore.*
