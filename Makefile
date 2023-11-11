@@ -8,14 +8,13 @@ CPPFLAGS = -Iinclude
 CFLAGS= -O2  -Wall -Wextra -Wpedantic 
 DEBUG= -g
 SRC_DIR := src
-SRC := $(wildcard $(SRC_DIR)/*.cc)
 TEST=python3 test.py
 OBJS=dns
 
 .PHONY: clean test
 
 make:$(SRC)
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(CFLAGS) -o $(OBJS) $(SRC)
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(CFLAGS) -o $(OBJS) $(SRC_DIR)/*.cc
 	
 
 debug:$(SRC)
