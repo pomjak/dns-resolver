@@ -18,10 +18,11 @@ def print_dict(listDict):
     for oneDict in listDict:
         print(oneDict)
         
-def create_artifact(dig,dns,test_case):
+def create_artifact(domain,dig,dns,test_case):
     subprocess.run(['mkdir','-p' ,'../test-artifacts/'], check=True)
-    subprocess.run(['touch','../test-artifacts/' + test_case['desc'].strip()], check=True)
-                        
+    subprocess.run(['mkdir','-p','../test-artifacts/' + test_case['desc'].strip()], check=True)
+    subprocess.run(['touch','../test-artifacts/' + test_case['desc'].strip()+"/"+ domain], check=True)
+    data_buffer = f""                        
 
 def run_command(cmd):   
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -54,7 +55,9 @@ def main():
             
             for domain in domain_file:
                 domain = domain.strip()
-
+                if test_case['desc'] == "reverse AAAA record":
+                    domain = ipaddress.ip_address(domain).exploded
+                    
                 dig_output, dig_stderr = run_command(test_case['dig'] + domain)
                 dns_output,dns_stderr = run_command(test_case['dns'] + domain)
                 
@@ -129,7 +132,7 @@ def main():
                         exit(1)
 
                     else:
-                        create_artifact(dig,dns,test_case)
+                        create_artifact(domain,dig,dns,test_case)
                         print(f"Test {GREEN}OK{RESET} [ {domain} ]")
 
 if __name__ == "__main__":
