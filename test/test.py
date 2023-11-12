@@ -24,6 +24,8 @@ commands = [
     {'desc':'AAAA-record',          'file':'domains',   'dig':f'dig @{SERVER} +noall +answer AAAA ', 'dns':f'./dns -r -s {SERVER} -6 '   },
     {'desc':'reverse-A-record',     'file':'ips',       'dig':f'dig @{SERVER} +noall +answer -x ',   'dns':f'./dns -r -s {SERVER} -x '   },
     {'desc':'reverse-AAAA-record',  'file':'ips6',      'dig':f'dig @{SERVER} +noall +answer -x ',   'dns':f'./dns -r -s {SERVER} -x -6 '},
+    {'desc':'Authority'          ,  'file':'domains',   'dig':f'dig @kazi.fit.vutbr.cz +noall +authority +norecurse ',   'dns':f'./dns -s kazi.fit.vutbr.cz '},
+    {'desc':'Additional'          , 'file':'domains',   'dig':f'dig @kazi.fit.vutbr.cz +noall +additional +norecurse ',   'dns':f'./dns -s kazi.fit.vutbr.cz '},
     ]
 
 def print_dict(listDict):
@@ -77,13 +79,13 @@ def create_artifact(status,domain,dig,dns,test_case):
         file.write(f"{test_case['dig']}{domain}\n")
         
         for oneDig in dig:
-            file.write(f"{oneDig}")
+            file.write(f"{oneDig}\n")
             
         file.write("\nDNS output:")    
         file.write(f"{test_case['dns']}{domain}\n")
 
-        for oneDns in dig:
-            file.write(f"{oneDns}")
+        for oneDns in dns:
+            file.write(f"{oneDns}\n")
             
         file.close()
                              
@@ -110,6 +112,36 @@ def cut_out_answer(data):
     
     return '\n'.join(result_lines[:-1])
 
+def cut_out_auth(data):
+    capture = False
+    result_lines = []
+
+    for line in data.split('\n'):
+        if capture:
+            result_lines.append(line.strip())
+        
+        if "Authority section " in line:
+            capture = True
+            
+        if "Additional section " in line:
+            capture = False
+            result_lines[-1] = ""
+    
+    return '\n'.join(result_lines[:-1])
+
+def cut_out_add(data):
+    capture = False
+    result_lines = []
+
+    for line in data.split('\n'):
+        if capture:
+            result_lines.append(line.strip())
+        
+        if "Additional section " in line:
+            capture = True
+    
+    return '\n'.join(result_lines[:-1])
+
 def args():
     print("__________ Argument Test__________")
     for test_case in args_cases:
@@ -126,6 +158,7 @@ def args():
 def Authoritative():
     print("__________ Authoritative Test__________")
     output, stderr, ret_code =run_command("./dns -s kazi.fit.vutbr.cz nes.fit.vutbr.cz")
+    
     if "Authoritative: Yes," not in output.decode("utf-8"):
         print(f"Test {RED}FAILED{RESET} [ Authoritative ]")
         print(f"Expected \"Authoritative: Yes\", got something else")
@@ -148,7 +181,12 @@ def dns_vs_dig():
                 dns_output,dns_stderr, ret_code= run_command(test_case['dns'] + domain)
                 
                 dig_output=dig_output[:-1].decode("utf-8")
-                dns_output=cut_out_answer(dns_output.decode("utf-8"))
+                if test_case['desc'] == "Authority":
+                    dns_output=cut_out_auth(dns_output.decode("utf-8"))
+                elif test_case['desc'] == "Additional":
+                    dns_output=cut_out_add(dns_output.decode("utf-8"))
+                else:
+                    dns_output=cut_out_answer(dns_output.decode("utf-8"))
                 
                 dig = []
                 dns = []
@@ -164,7 +202,7 @@ def dns_vs_dig():
                             rclass = rclass.strip()
                             rtype = rtype.strip()
                             data = data.strip()
-                            if "AAAA-record" == test_case['desc'] and rtype == 'AAAA': #exploding ip6 from dig
+                            if rtype == 'AAAA': #exploding ip6 from dig
                                 data = ipaddress.ip_address(data).exploded
 
                             new_record = {'name': name, 'class': rclass, 'type' : rtype, 'ttl' : ttl,'data' : data}
@@ -224,6 +262,7 @@ def dns_vs_dig():
                     else:
                         create_artifact("PASS",domain,dig,dns,test_case)
                         print(f"Test {GREEN}OK{RESET} [ {domain} ]")
+
 
 def main():
     args()

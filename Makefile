@@ -13,7 +13,7 @@ OBJS=dns
 
 .PHONY: clean test
 
-make:$(SRC)
+make:$(SRC) clean
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(CFLAGS) -o $(OBJS) $(SRC_DIR)/*.cc
 	
 
@@ -21,8 +21,8 @@ debug:$(SRC)
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(CFLAGS) $(DEBUG)-o $(OBJS) $(SRC)
 
 clean:
-	$(RM) $(OBJS) test-build test-artifacts
-	$(RM) vgcore.*
+	@$(RM) $(OBJS) test-build test-artifacts
+	@$(RM) vgcore.*
 	
 test:clean
 	@mkdir 			test-build/
@@ -35,6 +35,7 @@ test:clean
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(CFLAGS) *.cc -o dns &&\
 	$(TEST)
 	@cd ..
+	@cp test-build/dns dns
 	@rm -rf test-build/
 	@echo "--------------------------------------------------------"
 	@echo "the test results can be viewed in test-artifacts/ folder"
