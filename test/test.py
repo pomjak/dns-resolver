@@ -8,11 +8,13 @@ GREEN = '\033[0;32m'
 YELLOW = '\033[0;33m'
 RESET = '\033[0m'
 
+SERVER = "8.8.8.8"
+
 commands = [
-    {'desc':'A-record',             'file':'domains',   'dig':'dig @8.8.8.8 +noall +answer A ',          'dns':'./test -r -s 8.8.8.8 '       },
-    {'desc':'AAAA-record',          'file':'domains',   'dig':'dig @8.8.8.8 +noall +answer AAAA ',       'dns':'./test -r -s 8.8.8.8 -6 '    },
-    {'desc':'reverse-A-record',     'file':'ips',       'dig':'dig @8.8.8.8 +noall +answer -x ',       'dns':'./test -r -s 8.8.8.8 -x '    },
-    {'desc':'reverse-AAAA-record',  'file':'ips6',      'dig':'dig @8.8.8.8 +noall +answer -x ',    'dns':'./test -r -s 8.8.8.8 -x -6 ' },
+    {'desc':'A-record',             'file':'domains',   'dig':f'dig @{SERVER} +noall +answer A ',    'dns':f'./test -r -s {SERVER} '      },
+    {'desc':'AAAA-record',          'file':'domains',   'dig':f'dig @{SERVER} +noall +answer AAAA ', 'dns':f'./test -r -s {SERVER} -6 '   },
+    {'desc':'reverse-A-record',     'file':'ips',       'dig':f'dig @{SERVER} +noall +answer -x ',   'dns':f'./test -r -s {SERVER} -x '   },
+    {'desc':'reverse-AAAA-record',  'file':'ips6',      'dig':f'dig @{SERVER} +noall +answer -x ',   'dns':f'./test -r -s {SERVER} -x -6 '},
     ]
 
 def print_dict(listDict):
