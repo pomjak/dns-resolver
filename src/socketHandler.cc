@@ -41,7 +41,7 @@ void communicate::sendQuery(std::vector<uint8_t> msg)
     if (connect(resolverSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) == -1)
         throw std::runtime_error("Connect failed: " + std::string(strerror(errno)));
 
-    auto bytesTx = send(this->resolverSocket, msg.data(), msg.size(), MSG_CONFIRM);
+    auto bytesTx = send(this->resolverSocket, msg.data(), msg.size(), 0x800);
     if (bytesTx < 0)
         throw std::runtime_error("Sending message failed: " + std::string(strerror(errno)));
 
@@ -52,7 +52,7 @@ void communicate::sendQuery(std::vector<uint8_t> msg)
 std::vector<uint8_t> communicate::recvResponse(void)
 {
     char response[UDP_LIMIT];
-    auto bytesRead = recv(resolverSocket, response, UDP_LIMIT, MSG_WAITALL);
+    auto bytesRead = recv(resolverSocket, response, UDP_LIMIT, 0x100);
 
     if (bytesRead > 0)
     {
