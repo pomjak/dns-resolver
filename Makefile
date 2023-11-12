@@ -25,15 +25,19 @@ clean:
 	$(RM) vgcore.*
 	
 test:clean
-	mkdir 			test-build/
-	mkdir 			test-artifacts/
-	cp -r src/* 	test-build/
-	cp -r include/* test-build/
-	cp -r test/* 	test-build/
-	cp Makefile  	test-build/
+	@mkdir 			test-build/
+	@mkdir 			test-artifacts/
+	@cp -r src/* 	test-build/
+	@cp -r include/* test-build/
+	@cp -r test/* 	test-build/
+	@cp Makefile  	test-build/
 	cd test-build && \
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(CFLAGS) *.cc -o test &&\
 	$(TEST)
+	@cd ..
+	@rm -rf test-build/
+	@echo "--------------------------------------------------------"
+	@echo "the test results can be viewed in test-artifacts/ folder"
 
 changelog:
 	git log --pretty="- %s" | head -n -2 > CHANGELOG.md
