@@ -18,7 +18,7 @@
 //  25-27    Z       [SET]   000
 //  28-31    RCODE   [READ]  ERR CODE
 
-struct Header
+struct Header//HEADER structure designed for big endian
 {
     uint16_t id;
     uint16_t rd : 1;

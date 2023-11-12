@@ -16,7 +16,7 @@ args_cases = [
     {'desc':'without_address'                           , 'cmd':'./dns -s hello '                           ,'exp':1},
     {'desc':'bad_server'                                , 'cmd':'./dns -s hello world'                      ,'exp':1},
     {'desc':'without_address_but_server_ok'             , 'cmd':'./dns -s kazi.fit.vutbr.cz'                ,'exp':1},
-    {'desc':'entered_correctly_but_extra_arguments'    , 'cmd':'./dns -s kazi.fit.vutbr.cz www.fit.cz -f'  ,'exp':0},
+    {'desc':'entered_correctly_but_extra_arguments'     , 'cmd':'./dns -s kazi.fit.vutbr.cz www.fit.cz -f'  ,'exp':0},
 ]
 
 commands = [
@@ -38,12 +38,27 @@ def create_artifact_args(status,ret_code,test_case):
     
     with open(file_path, 'w') as file:
         if status == "PASS":
-            file.write(f"TEST {test_case['desc']}  PASSED")
+            file.write(f"TEST {test_case['desc']}  PASSED\n")
         else:
-            file.write(f"TEST {test_case['desc']} FAILED")
+            file.write(f"TEST {test_case['desc']} FAILED\n")
         
-        file.write(f"\nExpected \"{test_case['exp']}\", got \"{ret_code}\"\n{test_case['cmd']}")   
+        file.write(f"\nExpected \"{test_case['exp']}\", got \"{ret_code}\"\n{test_case['cmd']}\n")   
          
+        file.close()
+        
+def create_artifact_auth(status, output):
+    file_path = f"../test-artifacts/misc/Authoritative"
+    folder_path = f"../test-artifacts/misc"
+    os.makedirs(folder_path, exist_ok=True)
+    
+    with open(file_path, 'w') as file:
+        if status == "PASS":
+            file.write(f"TEST Authoritative  PASSED\n")
+        else:
+            file.write(f"TEST Authoritative FAILED\n")
+            file.write(f"Expected \"Authoritative: Yes\", got something else\n")   
+            
+        file.write(output)     
         file.close()
         
 def create_artifact(status,domain,dig,dns,test_case):
@@ -54,15 +69,19 @@ def create_artifact(status,domain,dig,dns,test_case):
     
     with open(file_path, 'w') as file:
         if status == "PASS":
-            file.write(f"TEST {test_case['desc']} for {domain} PASSED")
+            file.write(f"TEST {test_case['desc']} for {domain} PASSED\n")
         else:
-            file.write(f"TEST {test_case['desc']} for {domain} FAILED {status} not matching")
+            file.write(f"TEST {test_case['desc']} for {domain} FAILED {status} not matching\n")
             
-        file.write("\nDIG output:")
+        file.write("DIG output:\n")
+        file.write(f"{test_case['dig']}{domain}\n")
+        
         for oneDig in dig:
             file.write(f"{oneDig}")
             
         file.write("\nDNS output:")    
+        file.write(f"{test_case['dns']}{domain}\n")
+
         for oneDns in dig:
             file.write(f"{oneDns}")
             
@@ -104,6 +123,17 @@ def args():
             create_artifact_args("PASS",ret_code,test_case)
         
 
+def Authoritative():
+    print("__________ Authoritative Test__________")
+    output, stderr, ret_code =run_command("./dns -s kazi.fit.vutbr.cz nes.fit.vutbr.cz")
+    if "Authoritative: Yes," not in output.decode("utf-8"):
+        print(f"Test {RED}FAILED{RESET} [ Authoritative ]")
+        print(f"Expected \"Authoritative: Yes\", got something else")
+        create_artifact_auth("FAIL", output.decode("utf-8"))
+    else:
+        print(f"Test {GREEN}OK{RESET} [ Authoritative ]")
+        create_artifact_auth("PASS",output.decode("utf-8"))  
+    
 def dns_vs_dig():
     for test_case in commands:
         with open(test_case['file'], 'r') as domain_file: 
@@ -197,6 +227,7 @@ def dns_vs_dig():
 
 def main():
     args()
+    Authoritative()
     dns_vs_dig()
     
 
