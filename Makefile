@@ -37,8 +37,9 @@ test:clean
 	@cd ..
 	@cp test-build/dns dns
 	@rm -rf test-build/
-	@echo "--------------------------------------------------------"
-	@echo "the test results can be viewed in test-artifacts/ folder"
+	@echo "--------------------------------------------------------------"
+	@echo "!!!the test results can be viewed in test-artifacts/ folder!!!"
+	@echo "--------------------------------------------------------------"
 
 changelog:
 	git log --pretty="- %s" | head -n -2 > CHANGELOG.md
