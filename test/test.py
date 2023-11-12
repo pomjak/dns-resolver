@@ -9,10 +9,10 @@ YELLOW = '\033[0;33m'
 RESET = '\033[0m'
 
 commands = [
-    {'desc':'A record',             'file':'domains',   'dig':'dig @8.8.8.8 +noall +answer A ',          'dns':'./test -r -s 8.8.8.8 '       },
-    {'desc':'AAAA record',          'file':'domains',   'dig':'dig @8.8.8.8 +noall +answer AAAA ',       'dns':'./test -r -s 8.8.8.8 -6 '    },
-    {'desc':'reverse A record',     'file':'ips',       'dig':'dig @8.8.8.8 +noall +answer -x ',       'dns':'./test -r -s 8.8.8.8 -x '    },
-    {'desc':'reverse AAAA record',  'file':'ips6',      'dig':'dig @8.8.8.8 +noall +answer -x ',    'dns':'./test -r -s 8.8.8.8 -x -6 ' },
+    {'desc':'A-record',             'file':'domains',   'dig':'dig @8.8.8.8 +noall +answer A ',          'dns':'./test -r -s 8.8.8.8 '       },
+    {'desc':'AAAA-record',          'file':'domains',   'dig':'dig @8.8.8.8 +noall +answer AAAA ',       'dns':'./test -r -s 8.8.8.8 -6 '    },
+    {'desc':'reverse-A-record',     'file':'ips',       'dig':'dig @8.8.8.8 +noall +answer -x ',       'dns':'./test -r -s 8.8.8.8 -x '    },
+    {'desc':'reverse-AAAA-record',  'file':'ips6',      'dig':'dig @8.8.8.8 +noall +answer -x ',    'dns':'./test -r -s 8.8.8.8 -x -6 ' },
     ]
 
 def print_dict(listDict):
@@ -73,7 +73,7 @@ def main():
             
             for domain in domain_file:
                 domain = domain.strip()
-                if test_case['desc'] == "reverse AAAA record":
+                if test_case['desc'] == "reverse-AAAA-record":
                     domain = ipaddress.ip_address(domain).exploded
                     
                 dig_output, dig_stderr = run_command(test_case['dig'] + domain)
@@ -96,7 +96,7 @@ def main():
                             rclass = rclass.strip()
                             rtype = rtype.strip()
                             data = data.strip()
-                            if "AAAA record" == test_case['desc'] and rtype == 'AAAA': #exploding ip6 from dig
+                            if "AAAA-record" == test_case['desc'] and rtype == 'AAAA': #exploding ip6 from dig
                                 data = ipaddress.ip_address(data).exploded
 
                             new_record = {'name': name, 'class': rclass, 'type' : rtype, 'ttl' : ttl,'data' : data}
