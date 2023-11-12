@@ -32,7 +32,7 @@ test:clean
 	@cp -r test/* 	test-build/
 	@cp Makefile  	test-build/
 	cd test-build && \
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(CFLAGS) *.cc -o test &&\
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(CFLAGS) *.cc -o dns &&\
 	$(TEST)
 	@cd ..
 	@rm -rf test-build/

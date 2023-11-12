@@ -10,16 +10,41 @@ RESET = '\033[0m'
 
 SERVER = "8.8.8.8"
 
+args_cases = [
+    {'desc':'without_args'                              , 'cmd':'./dns -s'                                  ,'exp':1},
+    {'desc':'only_s_arg'                                , 'cmd':'./dns -s hello'                            ,'exp':1},
+    {'desc':'without_address'                           , 'cmd':'./dns -s hello '                           ,'exp':1},
+    {'desc':'bad_server'                                , 'cmd':'./dns -s hello world'                      ,'exp':1},
+    {'desc':'without_address_but_server_ok'             , 'cmd':'./dns -s kazi.fit.vutbr.cz'                ,'exp':1},
+    {'desc':'entered_correctly_but_extra_arguments'    , 'cmd':'./dns -s kazi.fit.vutbr.cz www.fit.cz -f'  ,'exp':0},
+]
+
 commands = [
-    {'desc':'A-record',             'file':'domains',   'dig':f'dig @{SERVER} +noall +answer A ',    'dns':f'./test -r -s {SERVER} '      },
-    {'desc':'AAAA-record',          'file':'domains',   'dig':f'dig @{SERVER} +noall +answer AAAA ', 'dns':f'./test -r -s {SERVER} -6 '   },
-    {'desc':'reverse-A-record',     'file':'ips',       'dig':f'dig @{SERVER} +noall +answer -x ',   'dns':f'./test -r -s {SERVER} -x '   },
-    {'desc':'reverse-AAAA-record',  'file':'ips6',      'dig':f'dig @{SERVER} +noall +answer -x ',   'dns':f'./test -r -s {SERVER} -x -6 '},
+    {'desc':'A-record',             'file':'domains',   'dig':f'dig @{SERVER} +noall +answer A ',    'dns':f'./dns -r -s {SERVER} '      },
+    {'desc':'AAAA-record',          'file':'domains',   'dig':f'dig @{SERVER} +noall +answer AAAA ', 'dns':f'./dns -r -s {SERVER} -6 '   },
+    {'desc':'reverse-A-record',     'file':'ips',       'dig':f'dig @{SERVER} +noall +answer -x ',   'dns':f'./dns -r -s {SERVER} -x '   },
+    {'desc':'reverse-AAAA-record',  'file':'ips6',      'dig':f'dig @{SERVER} +noall +answer -x ',   'dns':f'./dns -r -s {SERVER} -x -6 '},
     ]
 
 def print_dict(listDict):
     for oneDict in listDict:
         print(oneDict)
+     
+def create_artifact_args(status,ret_code,test_case):
+    file_path = f"../test-artifacts/args/{test_case['desc']}"
+    folder_path = f"../test-artifacts/args"
+    
+    os.makedirs(folder_path, exist_ok=True)
+    
+    with open(file_path, 'w') as file:
+        if status == "PASS":
+            file.write(f"TEST {test_case['desc']}  PASSED")
+        else:
+            file.write(f"TEST {test_case['desc']} FAILED")
+        
+        file.write(f"\nExpected \"{test_case['exp']}\", got \"{ret_code}\"\n{test_case['cmd']}")   
+         
+        file.close()
         
 def create_artifact(status,domain,dig,dns,test_case):
     file_path = f"../test-artifacts/{test_case['desc']}/{domain}"
@@ -47,7 +72,7 @@ def create_artifact(status,domain,dig,dns,test_case):
 def run_command(cmd):   
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
-    return stdout, stderr
+    return stdout, stderr, process.returncode
 
 def cut_out_answer(data):
     capture = False
@@ -66,10 +91,21 @@ def cut_out_answer(data):
     
     return '\n'.join(result_lines[:-1])
 
-def main():
-    
-    for test_case in commands:
+def args():
+    print("__________ Argument Test__________")
+    for test_case in args_cases:
+        output, stderr, ret_code =run_command(test_case['cmd'])
+        if ret_code != test_case['exp']:
+            print(f"Test {RED}FAILED{RESET} [{test_case['desc']}]")
+            print(f"Expected \"{test_case['exp']}\", got \"{ret_code}\"")
+            create_artifact_args(ret_code,ret_code,test_case)
+        else:
+            print(f"Test {GREEN}OK{RESET} [{test_case['desc']}]")
+            create_artifact_args("PASS",ret_code,test_case)
         
+
+def dns_vs_dig():
+    for test_case in commands:
         with open(test_case['file'], 'r') as domain_file: 
             print("__________ " + test_case['desc'] + " Test__________")
             
@@ -78,8 +114,8 @@ def main():
                 if test_case['desc'] == "reverse-AAAA-record":
                     domain = ipaddress.ip_address(domain).exploded
                     
-                dig_output, dig_stderr = run_command(test_case['dig'] + domain)
-                dns_output,dns_stderr = run_command(test_case['dns'] + domain)
+                dig_output, dig_stderr, ret_code = run_command(test_case['dig'] + domain)
+                dns_output,dns_stderr, ret_code= run_command(test_case['dns'] + domain)
                 
                 dig_output=dig_output[:-1].decode("utf-8")
                 dns_output=cut_out_answer(dns_output.decode("utf-8"))
@@ -158,6 +194,11 @@ def main():
                     else:
                         create_artifact("PASS",domain,dig,dns,test_case)
                         print(f"Test {GREEN}OK{RESET} [ {domain} ]")
+
+def main():
+    args()
+    dns_vs_dig()
+    
 
 if __name__ == "__main__":
     main()
