@@ -31,7 +31,7 @@ commands = [
 def print_dict(listDict):
     for oneDict in listDict:
         print(oneDict)
-     
+        
 def create_artifact_args(status,ret_code,test_case):
     file_path = f"../test-artifacts/args/{test_case['desc']}"
     folder_path = f"../test-artifacts/args"
@@ -45,7 +45,7 @@ def create_artifact_args(status,ret_code,test_case):
             file.write(f"TEST {test_case['desc']} FAILED\n")
         
         file.write(f"\nExpected \"{test_case['exp']}\", got \"{ret_code}\"\n{test_case['cmd']}\n")   
-         
+        
         file.close()
         
 def create_artifact_auth(status, output):
@@ -88,7 +88,6 @@ def create_artifact(status,domain,dig,dns,test_case):
             file.write(f"{oneDns}\n")
             
         file.close()
-                             
 
 def run_command(cmd):   
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
