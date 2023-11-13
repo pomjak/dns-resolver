@@ -197,7 +197,7 @@ void DnsMessage::printName(const std::vector<uint8_t> &response, uint16_t *offse
     {
         if ((response[*offset] & 0xC0) == 0xC0) // msg compression detected
         {
-            // concatenating 2xuint8_t to uint16_t
+            // concatenating 2 x uint8_t to uint16_t
             uint16_t pos = static_cast<uint16_t>(response[(*offset)]) |
                            (static_cast<uint16_t>(response[(*offset) + 1]) << 8);
 

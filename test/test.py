@@ -81,7 +81,7 @@ def create_artifact(status,domain,dig,dns,test_case):
         for oneDig in dig:
             file.write(f"{oneDig}\n")
             
-        file.write("\nDNS output:")    
+        file.write("\nDNS output:\n")    
         file.write(f"{test_case['dns']}{domain}\n")
 
         for oneDns in dns:
@@ -143,7 +143,7 @@ def cut_out_add(data):
     return '\n'.join(result_lines[:-1])
 
 def args():
-    print("__________ Argument Test__________")
+    print("\n__________ Argument Test__________")
     for test_case in args_cases:
         output, stderr, ret_code =run_command(test_case['cmd'])
         if ret_code != test_case['exp']:
@@ -156,7 +156,7 @@ def args():
         
 
 def Authoritative():
-    print("__________ Authoritative Test__________")
+    print("\n__________ Authoritative Test__________")
     output, stderr, ret_code =run_command("./dns -s kazi.fit.vutbr.cz nes.fit.vutbr.cz")
     
     if "Authoritative: Yes," not in output.decode("utf-8"):
@@ -170,7 +170,7 @@ def Authoritative():
 def dns_vs_dig():
     for test_case in commands:
         with open(test_case['file'], 'r') as domain_file: 
-            print("__________ " + test_case['desc'] + " Test__________")
+            print("\n__________ " + test_case['desc'] + " Test__________")
             
             for domain in domain_file:
                 domain = domain.strip()
