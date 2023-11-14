@@ -24,8 +24,8 @@ SERVER = "8.8.8.8"
 
 # Test cases for command-line arguments
 args_cases = [
-    {'desc':'without_args'                              , 'cmd':'./dns -s'                                  ,'exp':1},
-    {'desc':'only_s_arg'                                , 'cmd':'./dns -s hello'                            ,'exp':1},
+    {'desc':'without_args'                              , 'cmd':'./dns'                                     ,'exp':1},
+    {'desc':'only_s_arg'                                , 'cmd':'./dns -s'                                  ,'exp':1},
     {'desc':'without_address'                           , 'cmd':'./dns -s hello '                           ,'exp':1},
     {'desc':'bad_server'                                , 'cmd':'./dns -s hello world'                      ,'exp':1},
     {'desc':'without_address_but_server_ok'             , 'cmd':'./dns -s kazi.fit.vutbr.cz'                ,'exp':1},
