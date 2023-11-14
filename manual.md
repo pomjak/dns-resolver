@@ -4,11 +4,10 @@
     2. Řízení dotazů a přenos dat
     3. Chybové zprávy a ošetření chyb
     4. Konfigurovatelnost a Flexibilita
-2. Překlad doménových jmen
-3. Řízení Dotazů a Přenos Dat
-4. Chybová Zprávy a Ošetření Chyb
-5. Konfigurovatelnost a Flexibilita
-    
+2. popis implementace
+3. základní informace o programu
+4. Návod na použití
+5. Testovani
 
 ## 1. Úvod do problematiky
 
@@ -25,13 +24,12 @@ Implementace musí správně řídit různé druhy dotazů a zajistit přenos da
 
 DNS resolver by měl být schopen zpracovávat chybové stavy a situace. To zahrnuje interpretaci chybových zpráv od DNS serverů a vhodnou reakci na ně .[RFC1035]
 
-### 1.4 Konfigurovatelnost a Flexibilita
 
-Dobrý DNS resolver by měl poskytovat možnosti konfigurace a být dostatečně flexibilní, aby vyhovoval různým potřebám uživatelů a různým prostředím. [RFC1035]
+## 2. Popis implementace
 
-## 2. Návrh
+Dns resolver je implementován pomocí 3 tříd: SocketHandler, ParamParser a DnsMsg. Třída ParamParser obsahuje třídní metodu paramProcess, která zpracovává jednotlivé argumenty přijaté při spuštění programu. Následně předá zpracovaný port a adresu serveru objektu SocketHandler, který otevře UDP socket pro příslušnou adresu. V případě potřeby si vyhledá IP adresu pomocí funkce gethostbyname().
 
-
+Dále objekt ParamParser předá zpracované argumenty objektu třídy DnsMsg, který příslušně nastaví hlavičku a otázku DNS zprávy.
 
 ## Použitá literatura
- - 
+ -y
