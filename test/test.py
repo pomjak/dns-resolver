@@ -1,15 +1,28 @@
+"""
+    @file test.py
+    @author Pomsar Jakub (xpomsa00@stud.fit.vutbr.cz)
+    @brief test script for dns resolver
+    @version 0.1
+    @date 2023-11-14
+
+    @copyright Copyright (c) 2023
+"""
+
 import subprocess
 import ipaddress
 import traceback
 import os
 
+# ANSI color codes for terminal output
 RED = '\033[0;31m'
 GREEN = '\033[0;32m'
 YELLOW = '\033[0;33m'
 RESET = '\033[0m'
 
+# Default DNS server
 SERVER = "8.8.8.8"
 
+# Test cases for command-line arguments
 args_cases = [
     {'desc':'without_args'                              , 'cmd':'./dns -s'                                  ,'exp':1},
     {'desc':'only_s_arg'                                , 'cmd':'./dns -s hello'                            ,'exp':1},
@@ -19,6 +32,7 @@ args_cases = [
     {'desc':'entered_correctly_but_extra_arguments'     , 'cmd':'./dns -s kazi.fit.vutbr.cz www.fit.cz -f'  ,'exp':0},
 ]
 
+# Test cases for DNS queries
 commands = [
     {'desc':'A-record',             'file':'domains',   'dig':f'dig @{SERVER} +noall +answer A ',    'dns':f'./dns -r -s {SERVER} '      },
     {'desc':'AAAA-record',          'file':'domains',   'dig':f'dig @{SERVER} +noall +answer AAAA ', 'dns':f'./dns -r -s {SERVER} -6 '   },
@@ -32,6 +46,7 @@ def print_dict(listDict):
     for oneDict in listDict:
         print(oneDict)
         
+# Create artifacts for argument tests
 def create_artifact_args(status,ret_code,test_case):
     file_path = f"../test-artifacts/args/{test_case['desc']}"
     folder_path = f"../test-artifacts/args"
@@ -48,6 +63,7 @@ def create_artifact_args(status,ret_code,test_case):
         
         file.close()
         
+# Create artifacts for authoritative tests
 def create_artifact_auth(status, output):
     file_path = f"../test-artifacts/misc/Authoritative"
     folder_path = f"../test-artifacts/misc"
@@ -63,6 +79,7 @@ def create_artifact_auth(status, output):
         file.write(output)     
         file.close()
         
+# Create artifacts for DNS vs DIG tests
 def create_artifact(status,domain,dig,dns,test_case):
     file_path = f"../test-artifacts/{test_case['desc']}/{domain}"
     folder_path = f"../test-artifacts/{test_case['desc']}"
@@ -89,11 +106,13 @@ def create_artifact(status,domain,dig,dns,test_case):
             
         file.close()
 
+# Run a shell command and capture its output, error, and return code
 def run_command(cmd):   
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
     return stdout, stderr, process.returncode
 
+# Parse and cut out the answer section from DNS output
 def cut_out_answer(data):
     capture = False
     result_lines = []
@@ -111,6 +130,7 @@ def cut_out_answer(data):
     
     return '\n'.join(result_lines[:-1])
 
+# Parse and cut out the authority section from DNS output
 def cut_out_auth(data):
     capture = False
     result_lines = []
@@ -128,6 +148,7 @@ def cut_out_auth(data):
     
     return '\n'.join(result_lines[:-1])
 
+# Parse and cut out the Additional section from DNS output
 def cut_out_add(data):
     capture = False
     result_lines = []
@@ -141,6 +162,7 @@ def cut_out_add(data):
     
     return '\n'.join(result_lines[:-1])
 
+# Test command-line arguments
 def args():
     print("\n__________ Argument Test__________")
     for test_case in args_cases:
@@ -154,6 +176,7 @@ def args():
             create_artifact_args("PASS",ret_code,test_case)
         
 
+# Test authoritative responses
 def Authoritative():
     print("\n__________ Authoritative Test__________")
     output, stderr, ret_code =run_command("./dns -s kazi.fit.vutbr.cz nes.fit.vutbr.cz")
@@ -165,7 +188,8 @@ def Authoritative():
     else:
         print(f"Test {GREEN}OK{RESET} [ Authoritative ]")
         create_artifact_auth("PASS",output.decode("utf-8"))  
-    
+
+# Test DNS answers against DIG
 def dns_vs_dig():
     for test_case in commands:
         with open(test_case['file'], 'r') as domain_file: 
@@ -262,12 +286,12 @@ def dns_vs_dig():
                         create_artifact("PASS",domain,dig,dns,test_case)
                         print(f"Test {GREEN}OK{RESET} [ {domain} ]")
 
-
+# Main test function
 def main():
     args()
     Authoritative()
     dns_vs_dig()
     
-
+# Entry point for the script
 if __name__ == "__main__":
     main()
