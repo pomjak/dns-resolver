@@ -376,6 +376,11 @@ void DnsMessage::printRR(const std::vector<uint8_t> &response, uint16_t *offset,
     }
 }
 
+unsigned int DnsMessage::propagateError()
+{
+    return header.rcode;
+}
+
 /**
  * @brief prints information related to a DNS message from the response buffer.
  *

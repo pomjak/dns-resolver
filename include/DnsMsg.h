@@ -88,5 +88,7 @@ public:
 
     std::vector<uint8_t> handover() const;
 
+    unsigned int propagateError();
+    
     void printMsg(const std::vector<uint8_t> &response);
 };
