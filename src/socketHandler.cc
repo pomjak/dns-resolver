@@ -1,3 +1,13 @@
+/**
+ * @file socketHandler.cc
+ * @author Pomsar Jakub (xpomsa00@stud.fit.vutbr.cz)
+ * @brief Definition of functions of class communicate
+ * @version 0.1
+ * @date 2023-11-14
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
 #include "socketHandler.h"
 #include "paramParser.h"
 #include "DnsMsg.h"
