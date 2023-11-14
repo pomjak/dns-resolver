@@ -1,3 +1,14 @@
+- Create LICENSE
+- slight changes
+- edit test
+- test:formating
+- test:done
+- test: added inputs to artifacts
+- test: added tests for arguments
+- edit: test: refactring testing server
+- test:edit
+- ake test edit Makefile
+- eva fix again vol.2
 - eva fix again
 - eva fix gitignore
 - add header
