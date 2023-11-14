@@ -171,6 +171,7 @@ def args():
             print(f"Test {RED}FAILED{RESET} [{test_case['desc']}]")
             print(f"Expected \"{test_case['exp']}\", got \"{ret_code}\"")
             create_artifact_args(ret_code,ret_code,test_case)
+            
         else:
             print(f"Test {GREEN}OK{RESET} [{test_case['desc']}]")
             create_artifact_args("PASS",ret_code,test_case)
@@ -185,6 +186,7 @@ def Authoritative():
         print(f"Test {RED}FAILED{RESET} [ Authoritative ]")
         print(f"Expected \"Authoritative: Yes\", got something else")
         create_artifact_auth("FAIL", output.decode("utf-8"))
+        
     else:
         print(f"Test {GREEN}OK{RESET} [ Authoritative ]")
         create_artifact_auth("PASS",output.decode("utf-8"))  
@@ -262,25 +264,25 @@ def dns_vs_dig():
                         print(f"Test {RED}FAILED{RESET} [name of {domain}]")
                         print(f"Expected \"{dig_record['name']}\", got \"{dns_record['name']}\"")
                         create_artifact("NAME",domain,dig,dns,test_case)
-                        exit(1)
+                        
 
                     elif dig_record['class'] != dns_record['class']:
                         print(f"Test {RED}FAILED{RESET} [class of {domain}]")
                         print(f"Expected \"{dig_record['class']}\", got \"{dns_record['class']}\"")
                         create_artifact("CLASS",domain,dig,dns,test_case)
-                        exit(1)
+                        
 
                     elif dig_record['type'] != dns_record['type']:
                         print(f"Test {RED}FAILED{RESET} [type of {domain}]")
                         print(f"Expected \"{dig_record['type']}\", got \"{dns_record['type']}\"")
                         create_artifact("TYPE",domain,dig,dns,test_case)
-                        exit(1)
+                        
 
                     elif dig_record['data'] != dns_record['data']:
                         print(f"Test {RED}FAILED{RESET} [addr of {domain}]")
                         print(f"Expected \"{dig_record['data']}\", got \"{dns_record['data']}\"")
                         create_artifact("DATA",domain,dig,dns,test_case)
-                        exit(1)
+                        
 
                     else:
                         create_artifact("PASS",domain,dig,dns,test_case)
