@@ -4,10 +4,10 @@
 **Datum:** 14. 11. 2023  
 
 ## Obsah
-* 1.Úvod
-* 2.Spuštění programu
-* 3.Chybový výstup
-* 4.Struktura
+1. Úvod
+2. Spuštění programu
+3. Chybový výstup
+4. Struktura
 
 
 ## 1. Úvod
