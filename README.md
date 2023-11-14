@@ -3,7 +3,14 @@
 **Autor:** Jakub Pomsár  
 **Datum:** 14. 11. 2023  
 
-## Úvod
+## Obsah
+* 1.Úvod
+* 2.Spuštění programu
+* 3.Chybový výstup
+* 4.Struktura
+
+
+## 1. Úvod
 
 Program `dns` je implementací **DNS resolveru**, což znamená, že se specializuje na překlad lidsky čitelných doménových jmen na odpovídající IP adresy. Jeho hlavním úkolem je efektivně zpracovat vstup od uživatele, který obsahuje různé parametry a dotazy na DNS. Po získání vstupních informací vytvoří program odpovídající dotaz na DNS server, přičemž respektuje případné specifikace, jako jsou rekurze, dotazy na reverzní adresy nebo dotazy na IPv6 adresy.
 
@@ -11,7 +18,7 @@ Po odeslání dotazu na DNS server program čeká na odpověď. V případě ús
 
 Celkově program dns slouží jako prostředník mezi uživatelem a DNS serverem, usnadňující překlad doménových jmen na IP adresy a umožňující uživateli efektivní práci s DNS.
 
-## Spuštění programu
+## 2. Spuštění programu
 Program lze spustit následovně:
 
 ```bash
@@ -28,7 +35,7 @@ Kde: <br>
 
 Při kombinaci symbolů `x` a `6` program interpretuje jako reverzní dotaz na IPv6 adresu.
 
-## Chybový výstup
+## 3. Chybový výstup
 Pokud nejsou zadány všechny povinné argumenty, program se ukončí s chybovým hlášením a výpisem použití (USAGE).
 
 Pokud jsou zadány argumenty nad rámec výše zmíněného použití, jsou ignorovány, vypsáno je použití (USAGE), a program pokračuje.
@@ -50,3 +57,28 @@ Additional section (0)
 ```
 V tomto případě byl na server zaslán dotaz s adresou *192.168.0.1*, avšak nebyl specifikován argument `-x`, který by adresu správně zformátoval a nastavil příslušné příznaky v hlavičce zprávy. Tudíž DNS server vrací chybu *Name Error [No such name]*, a program se ukončí s odpovídajícím návratovým kódem (v tomto případě **3**).
 
+## 4. Struktura 
+* include/  
+    * DnsMsg.h
+    * Maps.h
+    * paramParser.h
+    * socketHandler.h
+
+* src/
+    * Dns.cc    
+    * DnsMsg.cc
+    * Maps.cc
+    * paramParser.cc
+    * socketHandler.cc
+
+* test/
+    * domains
+    * ips
+    * ips6
+    * test.py
+
+* CHANGELOG.md
+* LICENSE
+* Makefile
+* manual.pdf
+* README.md
