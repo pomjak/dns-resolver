@@ -376,6 +376,11 @@ void DnsMessage::printRR(const std::vector<uint8_t> &response, uint16_t *offset,
     }
 }
 
+/**
+ * @brief used propagating error code from server to user
+ * 
+ * @return unsigned int 
+ */
 unsigned int DnsMessage::propagateError()
 {
     return header.rcode;
