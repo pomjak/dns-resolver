@@ -1,3 +1,13 @@
+/**
+ * @file socketHandler.h
+ * @author Pomsar Jakub (xpomsa00@stud.fit.vutbr.cz)
+ * @brief header file of class communicate which handles connection over sockets
+ * @version 0.1
+ * @date 2023-11-14
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
 #pragma once
 
 #include <arpa/inet.h>

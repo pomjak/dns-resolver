@@ -1,3 +1,13 @@
+/**
+ * @file Maps.h
+ * @author Pomsar Jakub (xpomsa00@stud.fit.vutbr.cz)
+ * @brief extern declarations of maps used for remapping class, type and err code of dns msg
+ * @version 0.1
+ * @date 2023-11-14
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
 #pragma once
 
 #include <iostream>
