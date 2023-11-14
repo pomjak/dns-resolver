@@ -1,3 +1,13 @@
+/**
+ * @file paramParser.cc
+ * @author Pomsar Jakub (xpomsa00@stud.fit.vutbr.cz)
+ * @brief definition of functions  of class paramParser
+ * @version 0.1
+ * @date 2023-11-14
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
 #include "paramParser.h"
 
 enum class Option
