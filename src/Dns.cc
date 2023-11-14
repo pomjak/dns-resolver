@@ -1,7 +1,7 @@
 /**
  * @file Dns.cc
  * @author Pomsar Jakub (xpomsa00@stud.fit.vutbr.cz)
- * @brief DNS client main program
+ * @brief DNS resolver main program
  * @version 0.1
  * @date 2023-11-14
  *

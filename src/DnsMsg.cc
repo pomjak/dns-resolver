@@ -1,3 +1,15 @@
+/**
+ * @file DnsMsg.cc
+ * @author Pomsar Jakub (xpomsa00@stud.fit.vutbr.cz)
+ * @brief Implementation of functions needed for constructing and deconstructing DNS messages for the server.
+ *
+ * @version 0.1
+ * @date 2023-11-14
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
+
 #include "DnsMsg.h"
 #include "Maps.h"
 
