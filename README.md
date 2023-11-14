@@ -29,10 +29,11 @@ Kde: <br>
 Při kombinaci symbolů `x` a `6` program interpretuje jako reverzní dotaz na IPv6 adresu.
 
 ## Chybový výstup
-Pokud nejsou zadány všechny povinné argumenty, program se ukončí s chybovým hlášením a výpisem použití *USAGE*.
+Pokud nejsou zadány všechny povinné argumenty, program se ukončí s chybovým hlášením a výpisem použití (USAGE).
 
-Pokud jsou zadány argumenty nad rámec výše zmíněného použití, jsou ignorovány, je vypsáno použití *USAGE*, a program pokračuje.
+Pokud jsou zadány argumenty nad rámec výše zmíněného použití, jsou ignorovány, vypsáno je použití (USAGE), a program pokračuje.
 
+V případě, že není možné navázat spojení se serverem, program ukončí s chybovým výstupem a odpovídajícím návratovým kódem.
 
 Program **neprovádí žádnou kontrolu adresy** a očekává, že uživatel zadá adresu ve správném formátu odpovídajícím použitým symbolům či jejich kombinacím. Chybný vstup bude odhalen až při dotazu na DNS server, který vrátí odpovídající chybové hlášení. Typicky bývá takovéto chybové hlášení vypsáno následovně.
 
