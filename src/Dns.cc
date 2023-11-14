@@ -1,3 +1,14 @@
+/**
+ * @file Dns.cc
+ * @author Pomsar Jakub (xpomsa00@stud.fit.vutbr.cz)
+ * @brief DNS client main program
+ * @version 0.1
+ * @date 2023-11-14
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
+
 #include <iostream>
 #include <exception>
 #include "paramParser.h"
