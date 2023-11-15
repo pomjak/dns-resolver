@@ -22,31 +22,34 @@ Jediné, co zbylý nástroj potřebuje, je seznam adres názvových serverů, kt
 [rfc1034]
 
 
-## Návrh
+## 2.Návrh
 Po spojení informací z zadání , RFC 1034 a RFC 1035 je resolver implementován jako "stub resolver", který nemá seznam DNS serverů, které může kontaktovat při dotazech. Na rozdíl od "`stub resolveru`" z RFC, má pouze adresu jednoho serveru, která je zadána uživatelem. Podle standardu může resolver v některých případech komunikovat pomocí protokolu `TCP`, ale dle zadání to není požadováno [RFC1034]. Z důvodu zjednodušení implementace probíhá komunikace výhradně přes `UDP`. `TCP` komunikace a vyhledávání v mezipaměti tedy není implementováno. Resolver tedy konzultuje dotazy pouze s jedním DNS serverem a interpretuje jeho odpovědi a chybové stavy.
 
 Resolver dle zadání musí podporovat následující typy DNS záznamů: A, AAAA, CNAME, PTR. Kromě toho jsou rovněž podporovány záznamy typu NS (Name Server) a SOA (Start of Authority), které se často vyskytují při nerekurzivních dotazech.
 
 
-## 2. Popis implementace
+## 3. Popis implementace
 
-### Obecný popis implementace
+### 3.1 Obecný popis implementace
 Dns resolver je implementován pomocí 3 tříd: `SocketHandler`, `ParamParser` a `DnsMsg`. Třída `ParamParser` obsahuje třídní metodu `paramProcess`, která zpracovává jednotlivé argumenty přijaté při spuštění programu. Následně předá zpracovaný port a adresu serveru objektu `SocketHandler`, který otevře UDP socket pro příslušnou adresu. V případě potřeby si vyhledá IP adresu pomocí funkce `gethostbyname()`.
 
 Dále objekt ParamParser předá zpracované argumenty objektu třídy `DnsMsg`, který příslušně nastaví hlavičku a otázku DNS zprávy.
 
 Předá vytvořenou zprávu objektu třídy `SocketHandler`, který ji zašle na požadovaný DNS server a očekává odpověď. Následně jí vrátí objektu třídy `DnsMsg`. Ten zpracuje přijatou zprávu a vypíše ji uživateli na standardní výstup. V případě chyby resolveru nebo serveru na chybový výstup. Nakonec se program ukončí s odpovídajícím návratovým kódem.<br>
 Znázornění komunikace mezi třídami pomocí sekvenčního diagramu.
+
 [seq_dia]
  
-### Podrobnější popis zajímavých částí
-####  Překlad adresy DNS serveru
-V případě, že resolver neobdrží IP adresu DNS serveru, ale pouze doménové jméno DNS serveru, je nutné toto jméno přeložit na odpovídající IP adresu. Resolver tedy musí provést dotaz na překlad doménového jména. Pro tento případ je použita funkce `gethostbyname()`, která může vrátit několik IP adres. Resolver následně iteruje přes vrácené IP adresy a končí buď při prvním úspěchu, když najde platnou IP adresu, nebo končí neúspěšně a ukončuje program. Existuje také možnost rozšíření implementace nad rámec zadání, jak resolver dokáže zjistit IP adresu bez použití funkce `gethostbyname()`.
+### 3.2 Podrobnější popis zajímavých částí
+####  3.2.1 Překlad adresy DNS serveru
+V případě, že resolver neobdrží IP adresu DNS serveru, ale pouze doménové jméno DNS serveru, je nutné toto jméno přeložit na odpovídající IP adresu. Resolver tedy musí provést dotaz na překlad doménového jména. Pro tento případ je použita funkce `gethostbyname()`, která může vrátit několik IP adres. Resolver následně iteruje přes vrácené IP adresy a končí buď při prvním úspěchu, když najde platnou IP adresu, nebo končí neúspěšně a ukončuje program. Existuje také možnost rozšíření implementace nad rámec zadání, jak resolver dokáže zjistit IP adresu bez použití funkce `gethostbyname()`, která ovšem není implementována.
 
 V tomto případě může resolver nahlédnout do souboru `/etc/hosts`, zda se v něm nachází záznam o překladu doménového jména. V případě neúspěchu provede nahlédnutí do souboru `/etc/resolv.conf`, kde jsou implicitně zadány servery, kterých se může dotazovat. Tímto způsobem může resolver získat potřebnou IP adresu. Celkově tedy provede svou funkci dvakrát – nejprve pro získání IP adresy DNS serveru a poté pro dotaz na adresu zadávanou uživatelem.
 
-#### Kontrola adres
-Ve stávající implementaci není provedena žádná kontrola získaných adres od uživatele, a předpokládá se, že uživatel zadá adresu ve správném formátu odpovídajícím použitým symbolům či jejich kombinacím. V případě, když se uživatel dotazuje na reverzní dotaz s IPv6 adresou, resolver požaduje její celý nezkrácený formát. Přijímání zkrácených IPv6 adres může být považováno za možné rozšíření do budoucna. Tím se zaručuje správný převod z původní adresy na reverzní. Chybný vstup bude odhalen až při dotazu na DNS server, který vrátí odpovídající chybové hlášení. Resolver následně propaguje chybu a vrátí totožný návratový kód, jaký obdržel od DNS serveru. 
+#### 3.2.2 Kontrola adres
+Ve stávající implementaci není provedena žádná kontrola získaných adres od uživatele, a předpokládá se, že uživatel zadá adresu ve správném formátu odpovídajícím použitým symbolům či jejich kombinacím. V případě, když se uživatel dotazuje na reverzní dotaz s IPv6 adresou, resolver požaduje její celý nezkrácený formát. Tím se zaručuje správný převod z původní adresy na reverzní. Chybný vstup bude odhalen až při dotazu na DNS server, který vrátí odpovídající chybové hlášení. Resolver následně propaguje chybu a vrátí totožný návratový kód, jaký obdržel od DNS serveru. 
+
+Přijímání zkrácených IPv6 adres může být považováno za možné rozšíření do budoucna.
 
 V následujícím příkladu je spuštěn DNS resolver s adresou `1.1.1.1`, avšak není uveden příznak `-x`, který nastavuje typ dotazu na reverzní dotaz. Adresa je tedy špatně přeložena, a DNS server zasílá chybu *3* `Name Error [No such name]`, na základě které resolver ukončuje program s návratovým kódem *3*.
 
@@ -65,16 +68,16 @@ $ echo $?
 3
 ```
 
-#### Kontrola obdržených zpráv
-Je prováděna kontrola jednotlivých příznaků hlavičky příchozí zprávy. Zvláště je kontrolováno ID, aby se zajistilo, že se shoduje ID dotazu s odpovědi. Také se kontroluje příznak qr, který určuje, zda přijímaná zpráva je ve skutečnosti odpovědí, a ne další dotaz.
+#### 3.2.3 Kontrola obdržených zpráv
+Je prováděna kontrola jednotlivých příznaků hlavičky příchozí zprávy. Zvláště je kontrolováno ID, aby se zajistilo, že se shoduje ID dotazu s odpovědi. Také se kontroluje příznak `QR`, který určuje, zda přijímaná zpráva je ve skutečnosti odpovědí, a ne další dotaz.
 
 V případě, že je zpráva zkrácena, musí být nastaven příznak `TC` DNS serverem. Resolver by měl zahodit UDP datagram a přejít na TCP[serverfault]. Ovšem komunikace pomocí TCP není implementována, a v tomto případě se vypíše celá, i když zkrácená, zpráva spolu s informací`Truncation : Yes`.
 [https://serverfault.com/questions/991520/how-is-truncation-performed-in-dns-according-to-rfc-1035]
 
-#### Reverzní adresa
+#### 3.2.4 Reverzní adresa
 Standard RFC 1035 specifikuje způsob zasílání reverzních dotazů pomocí nastavení OPCODE v hlavičce zprávy na hodnotu 2, což reprezentuje reverzní dotaz.[rfc1035] V praxi většina serverů odpoví chybovou zprávou `not-implemented error`, což je povinná vlastnost implementace DNS serveru. Alternativou je zaslat IP adresu v reverzním formátu s příponou `in-addr.arpa` pro **IPv4** nebo v reverzním formátu s příponou `ip6.arpa` pro **IPv6** adresy.
 
-## Návod
+## 4. Návod
 Program lze spustit následovně:
 
 ```bash
@@ -91,9 +94,9 @@ Kde: <br>
 
 Kombinaci symbolů `x` a `6` program interpretuje jako reverzní dotaz na IPv6 adresu.
 
-## Testování
+## 5 Testování
 
-### automaticke testy
+### 5.1 automaticke testy
 Spolu s implementaci resolveru byly vytvoreny take automaticke testy, ktere testuji spravne zpracovani argumentu, vypis jednotlivych sekci (answer, authority a additional) a nastaveni zjistenych priznaku z hlavicky (Authority, Recursive).
 Spolehaji se na interpret Python3 a program dig
 
@@ -156,13 +159,14 @@ Vysledky testu jsou vygenereovany ve slozce `test-artifacts` s nasledujicic hire
     - 8.8.8.8
 
 
-### testovaci prostredi
-Projekt byl testovan na nekolik testovacich prostredich:
+### 5.2 Testovací prostředí
+Projekt byl testován na několika testovacích prostředích:
+
 - server merlin.fit.vutbr.cz
 - server eva.fit.vutbr.cz
-- lokalni zarizeni 
+- lokální zařízení
 
-### specifikace lokalniho zarizeni 
+### 5.3 Specifikace lokálního zařízení
 ```bash
 OS: EndeavourOS x86_64
 Host: Modern 14 B5M (REV:1.0)
@@ -177,7 +181,7 @@ DiG 9.18.19
 ```
 
 
-## Použitá literatura
+## 6. Použitá literatura
  -[rfc 1034]
  -[rfc 1035]
  -[https://serverfault.com/questions/991520/how-is-truncation-performed-in-dns-according-to-rfc-1035]
