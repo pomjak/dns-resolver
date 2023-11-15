@@ -11,12 +11,12 @@ Resolver je program, který slouží k propojení uživatelských programů s do
 
 Resolver je umístěn na stejném stroji jako program, který vyžaduje služby resolveru, ale může být nutné konzultovat jmenné servery na jiných hostech. Protože resolver může potřebovat konzultovat několik jmenných serverů nebo může mít požadované informace v místní mezipaměti, doba, kterou resolver potřebuje k dokončení, se může značně lišit, od milisekund po několik sekund. [rfc1034]
 
-Prvním krokem, který resolver provede, je transformace požadavku klienta, vyjádřeného ve formátu vhodném pro místní operační systém, do hledací specifikace pro záznamy zóny na konkrétním jménu, které odpovídají konkrétnímu typu otázky (`QTYPE`) a třídě otázky (`QCLASS`). [rfc1035]
+Prvním krokem, který resolver provede, je transformace požadavku klienta, do vyhledávací specifikace pro záznamy zóny na konkrétním jménu, které odpovídají konkrétnímu typu otázky (`QTYPE`) a třídě otázky (`QCLASS`). [rfc1035]
 
 
 ### 1.2 Zjednodušený resolver (Stub resolver) 
 
-Jednou možností implementace resolveru je přesunout funkci rozlišování z místního stroje do jmenného serveru, který podporuje rekurzivní dotazy. To může poskytnout snadný způsob poskytování služby domény na PC, které nemá dostatek prostředků k provádění funkce resolveru, nebo může centralizovat mezipaměť pro celou místní síť nebo organizaci.[rfc1034]
+Jednou možností implementace resolveru je `stub resolver`, který podporuje rekurzivní dotazy. To může poskytnout snadný způsob poskytování služby domény na PC, které nemá dostatek prostředků k provádění funkce resolveru, nebo může centralizovat mezipaměť pro celou místní síť nebo organizaci.[rfc1034]
 
 
 ## Návrh
@@ -33,7 +33,7 @@ Dns resolver je implementován pomocí 3 tříd: `SocketHandler`, `ParamParser` 
 Dále objekt ParamParser předá zpracované argumenty objektu třídy `DnsMsg`, který příslušně nastaví hlavičku a otázku DNS zprávy.
 
 Předá vytvořenou zprávu objektu třídy `SocketHandler`, který ji zašle na požadovaný DNS server a očekává odpověď. Následně jí vrátí objektu třídy `DnsMsg`. Ten zpracuje přijatou zprávu a vypíše ji uživateli na standardní výstup. V případě chyby resolveru nebo serveru na chybový výstup. Nakonec se program ukončí s odpovídajícím návratovým kódem.<br>
-Znazorneni komunikace mezi tridami pomoci sekvencniho diagramu
+Znázornění komunikace mezi třídami pomocí sekvenčního diagramu.
 [seq_dia]
  
 ### Podrobnější popis zajímavých částí
@@ -43,7 +43,7 @@ V případě, že resolver neobdrží IP adresu DNS serveru, ale pouze doménov�
 V tomto případě může resolver nahlédnout do souboru `/etc/hosts`, zda se v něm nachází záznam o překladu doménového jména. V případě neúspěchu provede nahlédnutí do souboru `/etc/resolv.conf`, kde jsou implicitně zadány servery, kterých se může dotazovat. Tímto způsobem může resolver získat potřebnou IP adresu. Celkově tedy provede svou funkci dvakrát – nejprve pro získání IP adresy DNS serveru a poté pro dotaz na adresu zadávanou uživatelem.
 
 #### Kontrola adres
-Ve stávající implementaci není provedena žádná kontrola získaných adres od uživatele, a předpokládá se, že uživatel zadá adresu ve správném formátu odpovídajícím použitým symbolům či jejich kombinacím. Chybný vstup bude odhalen až při dotazu na DNS server, který vrátí odpovídající chybové hlášení. Resolver následně propaguje chybu a vrátí totožný návratový kód, jaký obdržel od DNS serveru. 
+Ve stávající implementaci není provedena žádná kontrola získaných adres od uživatele, a předpokládá se, že uživatel zadá adresu ve správném formátu odpovídajícím použitým symbolům či jejich kombinacím. V případě, když se uživatel dotazuje na reverzní dotaz s IPv6 adresou, resolver požaduje její celý nezkrácený formát. Přijímání zkrácených IPv6 adres může být považováno za možné rozšíření do budoucna. Tím se zaručuje správný převod z původní adresy na reverzní. Chybný vstup bude odhalen až při dotazu na DNS server, který vrátí odpovídající chybové hlášení. Resolver následně propaguje chybu a vrátí totožný návratový kód, jaký obdržel od DNS serveru. 
 
 V následujícím příkladu je spuštěn DNS resolver s adresou `1.1.1.1`, avšak není uveden příznak `-x`, který nastavuje typ dotazu na reverzní dotaz. Adresa je tedy špatně přeložena, a DNS server zasílá chybu *3* `Name Error [No such name]`, na základě které resolver ukončuje program s návratovým kódem *3*.
 
@@ -63,17 +63,116 @@ $ echo $?
 ```
 
 #### Kontrola obdržených zpráv
-Je také prováděna kontrola jednotlivých příznaků hlavičky příchozí zprávy. Zvláště je kontrolováno ID, aby se zajistilo, že se shoduje s ID dotazu a odpovědi. Také se kontroluje priznak qr, který určuje, zda přijímaná zpráva je ve skutečnosti odpovědí, a ne další dotaz.
+Je prováděna kontrola jednotlivých příznaků hlavičky příchozí zprávy. Zvláště je kontrolováno ID, aby se zajistilo, že se shoduje ID dotazu s odpovědi. Také se kontroluje příznak qr, který určuje, zda přijímaná zpráva je ve skutečnosti odpovědí, a ne další dotaz.
 
-V případě, že je zpráva zkrácena, musí být nastaven priznak TC DNS serverem. Resolver by měl zahodit UDP datagram a přejít na TCP[serverfault]. Ovšem komunikace pomocí TCP není implementována, a v tomto případě se vypíše celá, i když zkrácená, zpráva spolu s informací`Truncation : Yes`.
+V případě, že je zpráva zkrácena, musí být nastaven příznak `TC` DNS serverem. Resolver by měl zahodit UDP datagram a přejít na TCP[serverfault]. Ovšem komunikace pomocí TCP není implementována, a v tomto případě se vypíše celá, i když zkrácená, zpráva spolu s informací`Truncation : Yes`.
 [https://serverfault.com/questions/991520/how-is-truncation-performed-in-dns-according-to-rfc-1035]
 
 #### Reverzní adresa
 Standard RFC 1035 specifikuje způsob zasílání reverzních dotazů pomocí nastavení OPCODE v hlavičce zprávy na hodnotu 2, což reprezentuje reverzní dotaz.[rfc1035] V praxi většina serverů odpoví chybovou zprávou `not-implemented error`, což je povinná vlastnost implementace DNS serveru. Alternativou je zaslat IP adresu v reverzním formátu s příponou `in-addr.arpa` pro **IPv4** nebo v reverzním formátu s příponou `ip6.arpa` pro **IPv6** adresy.
 
-## Navod
+## Návod
+Program lze spustit následovně:
 
-## Testovani
+```bash
+USAGE:
+./dns [-r] [-x] [-6] [-p port] -s server adresa
+```
+Kde: <br>
+*   Symbol `r` označuje požadovanou rekurzi (*recursion desired*).
+*   Symbol `x` signalizuje dotaz na reverzní adresu (*záznam PTR*).
+*   Symbol `6` indikuje dotaz na IPv6 adresu (*záznam AAAA*).
+*   Symbol `p` s argumentem `port` umožňuje specifikovat jiný port než výchozí *53*.
+*   Povinný symbol `s` s argumentem `server` definuje DNS server, na který je dotaz odeslán.
+*   Povinný argument `adresa` určuje předmět dotazu.
+
+Kombinaci symbolů `x` a `6` program interpretuje jako reverzní dotaz na IPv6 adresu.
+
+## Testování
+
+### automaticke testy
+Spolu s implementaci resolveru byly vytvoreny take automaticke testy, ktere testuji spravne zpracovani argumentu, vypis jednotlivych sekci (answer, authority a additional) a nastaveni zjistenych priznaku z hlavicky (Authority, Recursive).
+Spolehaji se na interpret Python3 a program dig
+
+testy lze spustit prikazem 
+```bash
+make test
+```
+Vysledky testu jsou vygenereovany ve slozce `test-artifacts` s nasledujicic hirearchii:
+- AAAA-record/
+    - isa.fit.vutbr.cz
+    - kazi.fit.vutbr.cz
+    - merlin.fit.vutbr.cz
+    - nes.fit.vutbr.cz
+    - www.fit.cz
+    - www.vutbr.cz
+- Additional/
+    - isa.fit.vutbr.cz
+    - kazi.fit.vutbr.cz
+    - merlin.fit.vutbr.cz
+    - nes.fit.vutbr.cz
+    - www.fit.cz
+    - www.vutbr.cz
+- A-record/
+    - isa.fit.vutbr.cz
+    - kazi.fit.vutbr.cz
+    - merlin.fit.vutbr.cz
+    - nes.fit.vutbr.cz
+    - www.fit.cz
+    - www.vutbr.cz
+- args/
+    - bad_server
+    - entered_correctly_but_extra_arguments
+    - only_s_arg
+    - without_address
+    - without_address_but_server_ok
+    - without_args
+- Authority/
+    - isa.fit.vutbr.cz
+    - kazi.fit.vutbr.cz
+    - merlin.fit.vutbr.cz
+    - nes.fit.vutbr.cz
+    - www.fit.cz
+    - www.vutbr.cz
+- misc/
+    - Authoritative
+- reverse-AAAA-record/
+    - 2001:067c:1220:0808:0000:0000:93e5:0810
+    - 2001:4860:4860:0000:0000:0000:0000:8844
+    - 2606:4700:4700:0000:0000:0000:0000:1001
+    - 2a00:1450:4014:080e:0000:0000:0000:2004
+- reverse-A-record/
+    - 1.1.1.1
+    - 147.229.176.18
+    - 147.229.176.19
+    - 147.229.2.90
+    - 147.229.8.12
+    - 147.229.8.16
+    - 185.145.160.34
+    - 8.8.4.4
+    - 8.8.8.8
+
+
+### testovaci prostredi
+Projekt byl testovan na nekolik testovacich prostredich:
+- server merlin.fit.vutbr.cz
+- server eva.fit.vutbr.cz
+- lokalni zarizeni 
+
+### specifikace lokalniho zarizeni 
+```bash
+OS: EndeavourOS x86_64
+Host: Modern 14 B5M (REV:1.0)
+Kernel: 6.1.62-1-lts
+CPU: AMD Ryzen 7 5700U (16) @ 4.37 GHz
+GPU: AMD Lucienne
+
+Python 3.11.5
+
+DiG 9.18.19
+
+```
+
 
 ## Použitá literatura
  -[rfc 1034]
