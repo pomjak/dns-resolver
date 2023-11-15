@@ -96,15 +96,19 @@ Kombinaci symbolů `x` a `6` program interpretuje jako reverzní dotaz na IPv6 a
 
 ## 5 Testování
 
-### 5.1 automaticke testy
-Spolu s implementaci resolveru byly vytvoreny take automaticke testy, ktere testuji spravne zpracovani argumentu, vypis jednotlivych sekci (answer, authority a additional) a nastaveni zjistenych priznaku z hlavicky (Authority, Recursive).
-Spolehaji se na interpret Python3 a program dig
+### 5.1 Automaticke testy
+V rámci implementace resolveru byly vytvořeny také automatické testy, které ověřují správné zpracování argumentů, výpis jednotlivých sekcí (*answer, authority a additional*) a nastavení zjištěných příznaků z hlavičky (*Authority, Recursive*).
 
-testy lze spustit prikazem 
+Tyto testy spoléhají na interpret Python3 a program dig pro provádění ověření.
+
+Tímto způsobem jsou zajištěny klíčové aspekty správné funkcionality resolveru.
+
+
+Testy lze spustit příkazem: 
 ```bash
 make test
 ```
-Vysledky testu jsou vygenereovany ve slozce `test-artifacts` s nasledujicic hirearchii:
+Výsledky testu jsou vygenerovány ve složce `test-artifacts` s následující hierarchií:
 - AAAA-record/
     - isa.fit.vutbr.cz
     - kazi.fit.vutbr.cz
@@ -159,6 +163,20 @@ Vysledky testu jsou vygenereovany ve slozce `test-artifacts` s nasledujicic hire
     - 8.8.8.8
 
 
+Příklad jednoho výsledku testu:
+```bash
+$ cat test-artifacts/A-record/nes.fit.vutbr.cz
+TEST A-record for nes.fit.vutbr.cz PASSED
+DIG output:
+dig @8.8.8.8 +noall +answer A nes.fit.vutbr.cz
+{'name': 'nes.fit.vutbr.cz.', 'class': 'IN', 'type': 'A', 'ttl': '14400', 'data': '147.229.8.16'}
+
+DNS output:
+./dns -r -s 8.8.8.8 nes.fit.vutbr.cz
+{'name': 'nes.fit.vutbr.cz.', 'class': 'IN', 'type': 'A', 'ttl': '13755', 'data': '147.229.8.16'}
+```
+
+
 ### 5.2 Testovací prostředí
 Projekt byl testován na několika testovacích prostředích:
 
@@ -177,7 +195,6 @@ GPU: AMD Lucienne
 Python 3.11.5
 
 DiG 9.18.19
-
 ```
 
 
