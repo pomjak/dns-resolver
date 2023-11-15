@@ -22,6 +22,7 @@ Jednou možností implementace resolveru je přesunout funkci rozlišování z m
 ## Návrh
 Po spojení informací z zadání , RFC 1034 a RFC 1035 je resolver implementován jako "stub resolver", který nemá seznam DNS serverů, které může kontaktovat při dotazech. Na rozdíl od "`stub resolveru`" z RFC, má pouze adresu jednoho serveru, která je zadána uživatelem. Podle standardu může resolver v některých případech komunikovat pomocí protokolu `TCP`, ale dle zadání to není požadováno [RFC1034]. Z důvodu zjednodušení implementace probíhá komunikace výhradně přes `UDP`. `TCP` komunikace a vyhledávání v mezipaměti tedy není implementováno. Resolver tedy konzultuje dotazy pouze s jedním DNS serverem a interpretuje jeho odpovědi a chybové stavy.
 
+Resolver dle zadání musí podporovat následující typy DNS záznamů: A, AAAA, CNAME, PTR. Kromě toho jsou rovněž podporovány záznamy typu NS (Name Server) a SOA (Start of Authority), které se často vyskytují při nerekurzivních dotazech.
 
 
 ## 2. Popis implementace
@@ -37,7 +38,7 @@ Znazorneni komunikace mezi tridami pomoci sekvencniho diagramu
  
 ### Podrobnější popis zajímavých částí
 ####  Překlad adresy DNS serveru
-V případě, že resolver neobdrží IP adresu DNS serveru, ale pouze doménové jméno DNS serveru, je nutné toto jméno přeložit na odpovídající IP adresu. Resolver tedy musí provést dotaz na překlad doménového jména. Pro tento případ je použita funkce gethostbyname(), která může vrátit několik IP adres. Resolver následně iteruje přes vrácené IP adresy a končí buď při prvním úspěchu, když najde platnou IP adresu, nebo končí neúspěšně a ukončuje program. Existuje také možnost rozšíření implementace nad rámec zadání, jak resolver dokáže zjistit IP adresu bez použití funkce `gethostbyname()`.
+V případě, že resolver neobdrží IP adresu DNS serveru, ale pouze doménové jméno DNS serveru, je nutné toto jméno přeložit na odpovídající IP adresu. Resolver tedy musí provést dotaz na překlad doménového jména. Pro tento případ je použita funkce `gethostbyname()`, která může vrátit několik IP adres. Resolver následně iteruje přes vrácené IP adresy a končí buď při prvním úspěchu, když najde platnou IP adresu, nebo končí neúspěšně a ukončuje program. Existuje také možnost rozšíření implementace nad rámec zadání, jak resolver dokáže zjistit IP adresu bez použití funkce `gethostbyname()`.
 
 V tomto případě může resolver nahlédnout do souboru `/etc/hosts`, zda se v něm nachází záznam o překladu doménového jména. V případě neúspěchu provede nahlédnutí do souboru `/etc/resolv.conf`, kde jsou implicitně zadány servery, kterých se může dotazovat. Tímto způsobem může resolver získat potřebnou IP adresu. Celkově tedy provede svou funkci dvakrát – nejprve pro získání IP adresy DNS serveru a poté pro dotaz na adresu zadávanou uživatelem.
 
@@ -70,7 +71,11 @@ V případě, že je zpráva zkrácena, musí být nastaven priznak TC DNS serve
 #### Reverzní adresa
 Standard RFC 1035 specifikuje způsob zasílání reverzních dotazů pomocí nastavení OPCODE v hlavičce zprávy na hodnotu 2, což reprezentuje reverzní dotaz.[rfc1035] V praxi většina serverů odpoví chybovou zprávou `not-implemented error`, což je povinná vlastnost implementace DNS serveru. Alternativou je zaslat IP adresu v reverzním formátu s příponou `in-addr.arpa` pro **IPv4** nebo v reverzním formátu s příponou `ip6.arpa` pro **IPv6** adresy.
 
+## Navod
 
+## Testovani
 
 ## Použitá literatura
- -y
+ -[rfc 1034]
+ -[rfc 1035]
+ -[https://serverfault.com/questions/991520/how-is-truncation-performed-in-dns-according-to-rfc-1035]
