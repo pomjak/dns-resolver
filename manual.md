@@ -16,7 +16,10 @@ Prvním krokem, který resolver provede, je transformace požadavku klienta, do 
 
 ### 1.2 Zjednodušený resolver (Stub resolver) 
 
-Jednou možností implementace resolveru je `stub resolver`, který podporuje rekurzivní dotazy. To může poskytnout snadný způsob poskytování služby domény na PC, které nemá dostatek prostředků k provádění funkce resolveru, nebo může centralizovat mezipaměť pro celou místní síť nebo organizaci.[rfc1034]
+Jedna možnost implementace resolveru spočívá v přesunu rezoluce z místního stroje do DNS serveru, který podporuje rekurzivní dotazy. To může poskytnout snadný způsob poskytování doménové služby na počítači, který nemá zdroje k provedení funkce resolveru, nebo může centralizovat mezipaměť pro celou místní síť nebo organizaci.
+
+Jediné, co zbylý nástroj potřebuje, je seznam adres názvových serverů, které provedou rekurzivní požadavky. Tento typ resolveru pravděpodobně potřebuje informace v konfiguračním souboru, protože pravděpodobně nemá sofistikovanost na to, aby je lokalizoval v databázi domény. Uživatel také potřebuje ověřit, zda uvedené servery provedou rekurzivní službu; názvový server může odmítnout provedení rekurzivních služeb pro kteréhokoli nebo všechny klienty. Uživatel by měl konzultovat místního správce systému, aby našel názvové servery ochotné provádět tuto službu.
+[rfc1034]
 
 
 ## Návrh
