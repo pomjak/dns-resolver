@@ -302,7 +302,13 @@ void DnsMessage::printHeader(const std::vector<uint8_t> &response, uint16_t *off
     // check if the ID matches
     if (originalId != header.id)
     {
-        std::cout << "Header ID does not match" << std::endl;
+        throw std::runtime_error("Header ID does not match");
+        return;
+    }
+    // check if the msg is response
+    if (header.qr != 1)
+    {
+        throw std::runtime_error("Message is a query, not a response");
         return;
     }
 
@@ -378,8 +384,8 @@ void DnsMessage::printRR(const std::vector<uint8_t> &response, uint16_t *offset,
 
 /**
  * @brief used propagating error code from server to user
- * 
- * @return unsigned int 
+ *
+ * @return unsigned int
  */
 unsigned int DnsMessage::propagateError()
 {
