@@ -215,7 +215,11 @@ void DnsMessage::printName(const std::vector<uint8_t> &response, uint16_t *offse
 
             pos = ntohs(pos & 0xFF3F); // getting rid of compress flag
             *offset += 2;
-            printName(response, &pos);
+            //checking if address is inside of boundary
+            if(pos <= response.size())
+                printName(response, &pos);
+            else    
+                throw std::runtime_error("received bad index");
             return;
         }
         else // print name directly
