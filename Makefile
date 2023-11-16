@@ -16,13 +16,15 @@ OBJS=dns
 make:$(SRC) clean
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(CFLAGS) -o $(OBJS) $(SRC_DIR)/*.cc
 	
+tar:clean
+	tar -cvf xpomsa00.tar CHANGELOG.md include LICENSE Makefile manual.pdf README.md src test
 
 debug:$(SRC)
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(CFLAGS) $(DEBUG)-o $(OBJS) $(SRC)
 
 clean:
 	@$(RM) $(OBJS) test-build test-artifacts
-	@$(RM) vgcore.*
+	@$(RM) vgcore.* xpomsa00.tar
 	
 test:clean
 	@mkdir 			test-build/
