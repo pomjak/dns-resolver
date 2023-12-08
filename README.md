@@ -82,3 +82,6 @@ V tomto případě byl na server zaslán dotaz s adresou *192.168.0.1*, avšak n
 * Makefile
 * manual.pdf
 * README.md
+
+## 5.Hodnoceni
+  20/20b
